@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Third party
+    "rest_framework",
     # Project apps
     "apps.phonics",
     "apps.sessions",
@@ -160,3 +162,12 @@ PHONEME_COMPLETION_THRESHOLD = 0.7
 
 # Error detection
 LOW_CONFIDENCE_THRESHOLD = 0.5
+
+REST_FRAMEWORK = {
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+    ],
+    "DEFAULT_PARSER_CLASSES": [
+        "rest_framework.parsers.JSONParser",
+    ],
+}

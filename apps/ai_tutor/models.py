@@ -4,8 +4,7 @@ from django.db import models
 class PromptTemplate(models.Model):
     name = models.CharField(
         max_length=100,
-        unique=True,
-        help_text="Unique identifier for this template, e.g., 'phonics_feedback'",
+        help_text="Identifier for this template, e.g., 'phonics_feedback'",
     )
     system_prompt = models.TextField(
         help_text="System-level prompt defining the AI tutor's behavior and constraints",
@@ -27,6 +26,7 @@ class PromptTemplate(models.Model):
 
     class Meta:
         ordering = ["-is_active", "-version"]
+        unique_together = [("name", "version")]
         verbose_name = "Prompt Template"
         verbose_name_plural = "Prompt Templates"
 

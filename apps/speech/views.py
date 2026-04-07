@@ -1,1 +1,119 @@
-# Create your views here.
+import logging
+import time
+
+from django.http import HttpResponse
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+from apps.ai_tutor.feedback import determine_feedback_strategy
+from apps.ai_tutor.llm_client import call_llm
+from apps.ai_tutor.services import render_prompt
+from apps.ai_tutor.validators import validate_response
+from apps.sessions.progress import record_attempt
+from apps.speech.azure_client import recognize_speech
+from apps.speech.error_detection import detect_error
+from apps.speech.serializers import SpeechAttemptRequestSerializer, SpeechAttemptResponseSerializer
+from apps.speech.tts_service import synthesize_speech
+
+logger = logging.getLogger(__name__)
+
+FALLBACK_FEEDBACK = "Great try! Let's practice that sound again!"
+
+
+@api_view(["POST"])
+def speech_attempt(request):
+    start_time = time.monotonic()
+
+    serializer = SpeechAttemptRequestSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    session_id = serializer.validated_data["session_id"]
+    phoneme_symbol = serializer.validated_data["phoneme"]
+    audio_bytes = serializer.validated_data["audio"]
+
+    stt_result = recognize_speech(audio_bytes)
+    if not stt_result.is_successful:
+        logger.warning("STT failed for session %s: %s", session_id, stt_result.error_message)
+        return Response(
+            SpeechAttemptResponseSerializer(
+                {
+                    "confidence": 0.0,
+                    "is_correct": False,
+                    "feedback": "I couldn't hear you clearly. Let's try again!",
+                    "detected_error": None,
+                    "attempt_number": 0,
+                }
+            ).data,
+            status=status.HTTP_200_OK,
+        )
+
+    error_result = detect_error(phoneme_symbol, stt_result.text, stt_result.confidence)
+
+    attempt = record_attempt(
+        session_id=session_id,
+        phoneme_symbol=phoneme_symbol,
+        confidence=stt_result.confidence,
+        error=error_result.detected_error,
+    )
+
+    feedback_ctx = determine_feedback_strategy(
+        session_id=session_id,
+        phoneme_symbol=phoneme_symbol,
+        current_confidence=stt_result.confidence,
+    )
+
+    try:
+        messages = render_prompt(
+            phoneme=phoneme_symbol,
+            confidence=stt_result.confidence,
+            error=error_result.detected_error,
+            attempts=feedback_ctx.attempt_count,
+        )
+        llm_response = call_llm(messages)
+        if llm_response.is_successful:
+            feedback = validate_response(llm_response.text)
+        else:
+            feedback = FALLBACK_FEEDBACK
+    except Exception:
+        logger.exception("AI feedback generation failed")
+        feedback = FALLBACK_FEEDBACK
+
+    elapsed_ms = (time.monotonic() - start_time) * 1000
+    logger.info(
+        "Speech attempt processed: session=%s phoneme=%s confidence=%.2f correct=%s time=%.0fms",
+        session_id,
+        phoneme_symbol,
+        stt_result.confidence,
+        error_result.is_correct,
+        elapsed_ms,
+    )
+
+    response_data = {
+        "confidence": stt_result.confidence,
+        "is_correct": error_result.is_correct,
+        "feedback": feedback,
+        "detected_error": error_result.detected_error,
+        "attempt_number": attempt.attempt_number,
+    }
+
+    return Response(SpeechAttemptResponseSerializer(response_data).data, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def text_to_speech(request):
+    text = request.query_params.get("text", "").strip()
+    if not text:
+        return Response({"error": "Missing 'text' query parameter"}, status=status.HTTP_400_BAD_REQUEST)
+    if len(text) > 100:
+        return Response({"error": "Text exceeds maximum length (100 characters)"}, status=status.HTTP_400_BAD_REQUEST)
+
+    result = synthesize_speech(text)
+    if not result.is_successful:
+        return Response({"error": "Failed to generate audio"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+    response = HttpResponse(result.audio_data, content_type=result.content_type)
+    response["Content-Length"] = len(result.audio_data)
+    response["Cache-Control"] = "public, max-age=3600"
+    return response
