@@ -77,7 +77,11 @@ SECRET_KEY = env("SECRET_KEY")
 DATABASES = {"default": env.db("DATABASE_URL")}
 
 # Static files via WhiteNoise
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 

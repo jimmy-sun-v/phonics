@@ -15,9 +15,9 @@ Build JSON API endpoints exposing aggregate diagnostics data: total attempts, av
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/diagnostics/summary/` | GET | Overall summary stats |
-| `/api/diagnostics/phonemes/` | GET | Per-phoneme metrics |
-| `/api/diagnostics/daily/` | GET | Daily activity trend |
+| `/api/speech/diagnostics/summary/` | GET | Overall summary stats |
+| `/api/speech/diagnostics/phonemes/` | GET | Per-phoneme metrics |
+| `/api/speech/diagnostics/daily/` | GET | Daily activity trend |
 
 ### Django Views
 
@@ -26,12 +26,16 @@ Build JSON API endpoints exposing aggregate diagnostics data: total attempts, av
 ```python
 from datetime import timedelta
 
+from django.conf import settings
 from django.db.models import Avg, Count, Q
+from django.db.models.functions import TruncDate
 from django.utils import timezone
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from apps.speech.models import SpeechAttempt
+
+CONFIDENCE_THRESHOLD = getattr(settings, "PHONEME_COMPLETION_THRESHOLD", 0.7)
 
 
 @api_view(["GET"])
@@ -50,7 +54,7 @@ def diagnostics_summary(request):
 
     stats = attempts.aggregate(
         avg_confidence=Avg("confidence"),
-        correct_count=Count("id", filter=Q(is_correct=True)),
+        correct_count=Count("id", filter=Q(confidence__gte=CONFIDENCE_THRESHOLD)),
     )
 
     session_count = attempts.values("session_id").distinct().count()
@@ -72,7 +76,7 @@ def diagnostics_by_phoneme(request):
         .annotate(
             attempts=Count("id"),
             avg_confidence=Avg("confidence"),
-            correct_count=Count("id", filter=Q(is_correct=True)),
+            correct_count=Count("id", filter=Q(confidence__gte=CONFIDENCE_THRESHOLD)),
         )
         .order_by("phoneme__category", "phoneme__symbol")
     )
@@ -98,7 +102,7 @@ def diagnostics_daily(request):
     daily = (
         SpeechAttempt.objects
         .filter(created_at__gte=since)
-        .extra(select={"day": "DATE(created_at)"})
+        .annotate(day=TruncDate("created_at"))
         .values("day")
         .annotate(
             attempts=Count("id"),
@@ -125,9 +129,9 @@ urlpatterns += [
 
 ## Acceptance Criteria
 
-- [ ] `/api/diagnostics/summary/` returns total attempts, avg_confidence, correct_rate, session count
-- [ ] `/api/diagnostics/phonemes/` returns per-phoneme breakdown
-- [ ] `/api/diagnostics/daily/` returns 30-day daily trend
+- [ ] `/api/speech/diagnostics/summary/` returns total attempts, avg_confidence, correct_rate, session count
+- [ ] `/api/speech/diagnostics/phonemes/` returns per-phoneme breakdown
+- [ ] `/api/speech/diagnostics/daily/` returns 30-day daily trend
 - [ ] Empty database returns zero/empty gracefully
 
 ## Test Strategy
@@ -144,22 +148,22 @@ from apps.speech.models import SpeechAttempt
 @pytest.mark.django_db
 class TestDiagnosticsAPI:
     def test_summary_empty(self, client):
-        resp = client.get("/api/diagnostics/summary/")
+        resp = client.get("/api/speech/diagnostics/summary/")
         assert resp.status_code == 200
         assert resp.json()["total_attempts"] == 0
 
     def test_summary_with_data(self, client, speech_attempt_factory):
-        speech_attempt_factory.create_batch(5, is_correct=True, confidence=0.9)
-        speech_attempt_factory.create_batch(5, is_correct=False, confidence=0.3)
+        speech_attempt_factory.create_batch(5, confidence=0.9)
+        speech_attempt_factory.create_batch(5, confidence=0.3)
 
-        resp = client.get("/api/diagnostics/summary/")
+        resp = client.get("/api/speech/diagnostics/summary/")
         data = resp.json()
         assert data["total_attempts"] == 10
         assert data["correct_rate"] == 0.5
 
     def test_phonemes_endpoint(self, client, speech_attempt_factory):
         speech_attempt_factory.create(confidence=0.8)
-        resp = client.get("/api/diagnostics/phonemes/")
+        resp = client.get("/api/speech/diagnostics/phonemes/")
         assert resp.status_code == 200
         assert len(resp.json()) >= 1
 ```

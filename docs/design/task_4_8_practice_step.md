@@ -15,7 +15,7 @@ Build the "Practice" step showing available games for the current phoneme. User 
 
 | URL | View | Template |
 |-----|------|----------|
-| `/learn/<symbol>/practice/` | `practice_step_view` | `learning/practice.html` |
+| `/phonics/learn/<symbol>/practice/` | `practice_step_view` | `learning/practice.html` |
 
 ### Django View
 

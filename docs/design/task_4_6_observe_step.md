@@ -14,7 +14,7 @@ Build the "Observe" step: display the phoneme letter(s) with animation and show 
 
 | URL | View | Template |
 |-----|------|----------|
-| `/learn/<symbol>/observe/` | `observe_step_view` | `learning/observe.html` |
+| `/phonics/learn/<symbol>/observe/` | `observe_step_view` | `learning/observe.html` |
 
 ### Template
 
@@ -67,7 +67,7 @@ Build the "Observe" step: display the phoneme letter(s) with animation and show 
 ### Django View
 
 ```python
-# apps/phonics/views.py (add)
+# apps/phonics/page_views.py (add)
 def observe_step_view(request, symbol):
     phoneme = get_phoneme_detail(symbol)
     if phoneme is None:

@@ -47,7 +47,7 @@ Azure OpenAI includes built-in content filtering. Verify default filters are ena
 - Violence: Medium
 - Self-harm: Medium
 
-These act as an additional safety layer beyond our application-level `validate_llm_response()`.
+These act as an additional safety layer beyond our application-level `validate_response()`.
 
 ### Rate Limiting
 

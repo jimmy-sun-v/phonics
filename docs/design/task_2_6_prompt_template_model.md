@@ -21,8 +21,7 @@ from django.db import models
 class PromptTemplate(models.Model):
     name = models.CharField(
         max_length=100,
-        unique=True,
-        help_text="Unique identifier for this template, e.g., 'phonics_feedback'",
+        help_text="Identifier for this template, e.g., 'phonics_feedback'",
     )
     system_prompt = models.TextField(
         help_text="System-level prompt defining the AI tutor's behavior and constraints",
@@ -44,6 +43,7 @@ class PromptTemplate(models.Model):
 
     class Meta:
         ordering = ["-is_active", "-version"]
+        unique_together = [("name", "version")]
         verbose_name = "Prompt Template"
         verbose_name_plural = "Prompt Templates"
 
@@ -73,7 +73,7 @@ class PromptTemplate(models.Model):
 
 ### Design Decisions
 
-- **`name` unique**: Each template is identified by a unique name. The service layer retrieves the active template by name.
+- **`(name, version)` unique together**: Each template is identified by name, with multiple versions allowed. The service layer retrieves the active template by name.
 - **`render()` method**: Convenience method on the model itself for simple placeholder interpolation. Uses Python's `str.format()`.
 - **`version` field**: Allows tracking changes. When updating a template, create a new version and deactivate the old one.
 - **Active template enforcement**: The service layer (Task 3.7) will ensure only one active template per name is used at query time, using `filter(name=..., is_active=True).order_by('-version').first()`.
@@ -103,7 +103,7 @@ Table: `ai_tutor_prompttemplate`
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | bigint | PK, auto-increment |
-| name | varchar(100) | UNIQUE, NOT NULL |
+| name | varchar(100) | NOT NULL |
 | system_prompt | text | NOT NULL |
 | user_template | text | NOT NULL |
 | is_active | boolean | NOT NULL, default true, indexed |
@@ -115,7 +115,7 @@ Table: `ai_tutor_prompttemplate`
 
 - [ ] Template created with placeholder syntax
 - [ ] `render(phoneme="/sh/", confidence=0.61, error="/s/", attempts=3)` returns correct message list
-- [ ] Unique name constraint enforced
+- [ ] Unique (name, version) constraint enforced
 - [ ] `is_active` filterable
 - [ ] Version is a positive integer
 

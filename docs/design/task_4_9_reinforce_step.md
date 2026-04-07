@@ -15,7 +15,7 @@ Build the "Reinforce" step with celebration animation, encouraging message, prog
 
 | URL | View | Template |
 |-----|------|----------|
-| `/learn/<symbol>/reinforce/` | `reinforce_step_view` | `learning/reinforce.html` |
+| `/phonics/learn/<symbol>/reinforce/` | `reinforce_step_view` | `learning/reinforce.html` |
 
 ### Template
 

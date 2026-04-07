@@ -19,7 +19,7 @@ Build a page displaying all 6 phonics categories as large, tappable cards. Fetch
 
 ### Django View (Template View)
 
-**File: `apps/phonics/views.py`** (add template view alongside API views)
+**File: `apps/phonics/page_views.py`** (template views in separate file from API views)
 
 ```python
 from django.shortcuts import render
@@ -149,18 +149,18 @@ def category_list_view(request):
 
 ### URL Configuration
 
-In `apps/phonics/urls.py`, add the template view:
+In `apps/phonics/page_urls.py`, add the template view:
 ```python
-path("", views.category_list_view, name="category-list-page"),
+path("", page_views.category_list_view, name="category-list-page"),
 ```
 
 In `config/urls.py`, add:
 ```python
-path("phonics/", include("apps.phonics.urls")),  # Template views
+path("phonics/", include("apps.phonics.page_urls")),  # Template views
 path("api/phonics/", include("apps.phonics.urls")),  # API views
 ```
 
-Note: Page views and API views share the same app but serve different URL prefixes. The `urls.py` should differentiate or use separate url files.
+Note: Page views use `apps/phonics/page_urls.py` (with `app_name = "phonics"`) while API views use `apps/phonics/urls.py` (no `app_name`) to avoid namespace conflicts.
 
 ### Audio Cue (Optional)
 

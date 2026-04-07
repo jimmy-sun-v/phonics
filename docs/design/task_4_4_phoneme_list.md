@@ -19,7 +19,7 @@ Build a page listing phonemes within a selected category as tappable tiles, each
 
 ### Django View
 
-**File: `apps/phonics/views.py`** (add)
+**File: `apps/phonics/page_views.py`** (add)
 
 ```python
 from django.shortcuts import render, redirect
@@ -132,9 +132,9 @@ def phoneme_list_view(request, category):
 
 ### URL Configuration
 
-In `apps/phonics/urls.py`:
+In `apps/phonics/page_urls.py`:
 ```python
-path("<str:category>/", views.phoneme_list_view, name="phoneme-list-page"),
+path("<str:category>/", page_views.phoneme_list_view, name="phoneme-list-page"),
 ```
 
 ## Acceptance Criteria

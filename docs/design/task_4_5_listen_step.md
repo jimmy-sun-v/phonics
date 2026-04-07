@@ -15,12 +15,12 @@ Build the "Listen" step of the learning loop: TTS audio plays the phoneme sound,
 
 | URL | View | Template |
 |-----|------|----------|
-| `/learn/<symbol>/listen/` | `listen_step_view` | `learning/listen.html` |
+| `/phonics/learn/<symbol>/listen/` | `listen_step_view` | `learning/listen.html` |
 
 ### Django View
 
 ```python
-# apps/phonics/views.py (add)
+# apps/phonics/page_views.py (add)
 def listen_step_view(request, symbol):
     phoneme = get_phoneme_detail(symbol)
     if phoneme is None:

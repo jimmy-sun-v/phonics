@@ -15,7 +15,7 @@ Build the "Repeat" step: capture audio via browser MediaRecorder API, submit to 
 
 | URL | View | Template |
 |-----|------|----------|
-| `/learn/<symbol>/repeat/` | `repeat_step_view` | `learning/repeat.html` |
+| `/phonics/learn/<symbol>/repeat/` | `repeat_step_view` | `learning/repeat.html` |
 
 ### Template
 

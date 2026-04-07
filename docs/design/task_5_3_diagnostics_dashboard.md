@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadSummary() {
-    const resp = await fetch('/api/diagnostics/summary/');
+    const resp = await fetch('/api/speech/diagnostics/summary/');
     const data = await resp.json();
 
     document.getElementById('totalAttempts').textContent = data.total_attempts;
@@ -92,7 +92,7 @@ async function loadSummary() {
 }
 
 async function loadDailyChart() {
-    const resp = await fetch('/api/diagnostics/daily/');
+    const resp = await fetch('/api/speech/diagnostics/daily/');
     const data = await resp.json();
 
     new Chart(document.getElementById('dailyChart'), {
@@ -116,7 +116,7 @@ async function loadDailyChart() {
 }
 
 async function loadPhonemeChart() {
-    const resp = await fetch('/api/diagnostics/phonemes/');
+    const resp = await fetch('/api/speech/diagnostics/phonemes/');
     const data = await resp.json();
 
     new Chart(document.getElementById('phonemeChart'), {
