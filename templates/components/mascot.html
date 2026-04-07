@@ -1,0 +1,12 @@
+{# Usage: {% include "components/mascot.html" with state="idle" %} #}
+{# States: idle, happy, encouraging #}
+{% load static %}
+<div class="mascot mascot--{{ state|default:'idle' }}" role="img" aria-label="Friendly owl mascot">
+    <img
+        src="{% static 'images/mascot/mascot.svg' %}"
+        alt="Phonics Tutor Mascot"
+        class="mascot__image"
+        width="80"
+        height="80"
+    >
+</div>

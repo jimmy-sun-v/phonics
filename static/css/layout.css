@@ -1,0 +1,190 @@
+/* === App Shell Layout === */
+.app-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* === Header === */
+.app-header {
+    background: linear-gradient(135deg, #4a90d9 0%, #357abd 100%);
+    color: white;
+    padding: 0.75rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+/* === Main Content === */
+.main-content {
+    flex: 1;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* === Bottom Navigation (Mobile) === */
+.app-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 2px solid #e0e0e0;
+    display: flex;
+    justify-content: space-around;
+    padding: 0.5rem 0;
+    z-index: 100;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #666;
+    font-size: 0.75rem;
+    min-height: 48px;
+    min-width: 48px;
+    justify-content: center;
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.nav-item:hover, .nav-item:focus {
+    background-color: #f0f4ff;
+    color: #4a90d9;
+}
+
+.nav-item.active {
+    color: #4a90d9;
+    font-weight: 600;
+}
+
+.nav-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.125rem;
+}
+
+/* Add bottom padding for fixed nav */
+body {
+    padding-bottom: 70px;
+}
+
+/* === Content Grid Helpers === */
+.card-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+}
+
+.card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card:hover, .card:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card:active {
+    transform: translateY(0);
+}
+
+/* === Large Action Button === */
+.btn-primary {
+    background-color: #4a90d9;
+    color: white;
+    border: none;
+    border-radius: 24px;
+    padding: 0.875rem 2rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    min-height: 48px;
+    min-width: 48px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background-color: #357abd;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: #4a90d9;
+    border: 2px solid #4a90d9;
+    border-radius: 24px;
+    padding: 0.875rem 2rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    min-height: 48px;
+    min-width: 48px;
+    cursor: pointer;
+}
+
+/* === Responsive: Tablet (768px+) === */
+@media (min-width: 768px) {
+    .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .main-content {
+        padding: 1.5rem;
+    }
+
+    body {
+        padding-bottom: 0;
+    }
+
+    /* Side nav on tablet */
+    .app-nav {
+        position: static;
+        flex-direction: column;
+        width: 200px;
+        border-top: none;
+        border-right: 2px solid #e0e0e0;
+        padding: 1rem;
+    }
+
+    .app-shell {
+        flex-direction: row;
+    }
+
+    .app-shell > .main-content {
+        flex: 1;
+    }
+}
+
+/* === Responsive: Desktop (1024px+) === */
+@media (min-width: 1024px) {
+    .card-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .main-content {
+        padding: 2rem;
+    }
+}

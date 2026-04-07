@@ -20,6 +20,9 @@ from django.urls import include, path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    # Template (page) views
+    path("phonics/", include("apps.phonics.page_urls")),
+    # API views
     path("api/phonics/", include("apps.phonics.urls")),
     path("api/sessions/", include("apps.sessions.urls")),
     path("api/speech/", include("apps.speech.urls")),

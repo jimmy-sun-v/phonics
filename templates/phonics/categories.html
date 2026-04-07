@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Choose a Sound Group{% endblock %}
+{% block header_title %}Pick a Sound!{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/phonics.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="category-page">
+    <p class="page-instruction" aria-live="polite">Tap to start!</p>
+
+    <div class="card-grid category-grid">
+        {% for cat in categories %}
+        <a href="{% url 'phonics:phoneme-list-page' cat.value %}"
+           class="card category-card"
+           style="border-left: 4px solid {{ cat.color }}"
+           aria-label="{{ cat.label }} - {{ cat.count }} sounds">
+            <span class="category-icon" aria-hidden="true">{{ cat.icon }}</span>
+            <span class="category-label">{{ cat.label }}</span>
+            <span class="category-count">{{ cat.count }} sounds</span>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

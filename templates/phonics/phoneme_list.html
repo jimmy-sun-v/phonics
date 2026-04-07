@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ category_label }}{% endblock %}
+{% block header_title %}{{ category_label }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/phonics.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="phoneme-list-page">
+    <a href="{% url 'phonics:category-list-page' %}" class="back-link" aria-label="Back to categories">
+        ← Back
+    </a>
+
+    <div class="card-grid phoneme-grid">
+        {% for phoneme in phonemes %}
+        <a href="{% url 'phonics:category-list-page' %}"
+           class="card phoneme-tile"
+           aria-label="{{ phoneme.symbol }} as in {{ phoneme.example_words.0 }}">
+            <span class="phoneme-symbol">{{ phoneme.symbol }}</span>
+            <span class="phoneme-example">{{ phoneme.example_words.0 }}</span>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

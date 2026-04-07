@@ -1,0 +1,101 @@
+.page-instruction {
+    text-align: center;
+    font-size: 1.25rem;
+    color: #666;
+    margin-bottom: 1.5rem;
+}
+
+.category-card {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    min-height: 120px;
+}
+
+.category-icon {
+    font-size: 2.5rem;
+}
+
+.category-label {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.category-count {
+    font-size: 0.875rem;
+    color: #888;
+}
+
+.category-card:active {
+    transform: scale(0.97);
+}
+
+/* === Responsive Category Grid === */
+.category-grid {
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+    .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .category-card {
+        min-height: 140px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .category-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* === Phoneme List === */
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    color: #4a90d9;
+    text-decoration: none;
+    font-size: 1rem;
+    min-height: 48px;
+    margin-bottom: 1rem;
+}
+
+.phoneme-tile {
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1.25rem;
+    min-height: 100px;
+}
+
+.phoneme-symbol {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    font-family: "Courier New", monospace;
+}
+
+.phoneme-example {
+    font-size: 0.875rem;
+    color: #888;
+    font-style: italic;
+}
+
+/* === Responsive Phoneme Grid === */
+.phoneme-grid {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 768px) {
+    .phoneme-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .phoneme-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}

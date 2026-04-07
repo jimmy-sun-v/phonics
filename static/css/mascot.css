@@ -1,0 +1,83 @@
+/* === Mascot Base === */
+.mascot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+.mascot__image {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+/* === Mascot States === */
+.mascot--idle {
+    animation: mascot-breathe 3s ease-in-out infinite;
+}
+
+.mascot--happy {
+    animation: mascot-bounce 0.6s ease-in-out;
+}
+
+.mascot--encouraging {
+    animation: mascot-nod 0.8s ease-in-out;
+}
+
+/* === Animations === */
+@keyframes mascot-breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+@keyframes mascot-bounce {
+    0%, 100% { transform: translateY(0); }
+    25% { transform: translateY(-10px); }
+    50% { transform: translateY(0); }
+    75% { transform: translateY(-5px); }
+}
+
+@keyframes mascot-nod {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(5deg); }
+    75% { transform: rotate(-5deg); }
+}
+
+/* === Responsive: Mobile — Fixed bottom-right === */
+@media (max-width: 767px) {
+    .app-header .mascot {
+        display: none;
+    }
+
+    .mascot-mobile {
+        position: fixed;
+        bottom: 80px;
+        right: 16px;
+        z-index: 50;
+    }
+
+    .mascot-mobile .mascot__image {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+/* === Responsive: Tablet/Desktop — In header === */
+@media (min-width: 768px) {
+    .mascot-mobile {
+        display: none;
+    }
+
+    .mascot__image {
+        width: 70px;
+        height: 70px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .mascot__image {
+        width: 80px;
+        height: 80px;
+    }
+}
