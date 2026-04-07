@@ -3,6 +3,8 @@ from dataclasses import dataclass
 
 from django.conf import settings
 
+from apps.speech.logging_config import log_service_call
+
 logger = logging.getLogger(__name__)
 
 
@@ -14,6 +16,7 @@ class STTResult:
     error_message: str | None = None
 
 
+@log_service_call("azure_stt")
 def recognize_speech(audio_data: bytes, expected_text: str | None = None) -> STTResult:
     import azure.cognitiveservices.speech as speechsdk
 

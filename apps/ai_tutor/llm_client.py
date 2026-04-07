@@ -3,6 +3,8 @@ from dataclasses import dataclass
 
 from django.conf import settings
 
+from apps.speech.logging_config import log_service_call
+
 logger = logging.getLogger(__name__)
 
 
@@ -13,6 +15,7 @@ class LLMResponse:
     error_message: str | None = None
 
 
+@log_service_call("azure_llm")
 def call_llm(messages: list[dict[str, str]]) -> LLMResponse:
     from openai import AzureOpenAI
 

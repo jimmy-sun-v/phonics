@@ -68,6 +68,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "apps.speech.middleware.AttemptLoggingMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -162,6 +163,33 @@ PHONEME_COMPLETION_THRESHOLD = 0.7
 
 # Error detection
 LOW_CONFIDENCE_THRESHOLD = 0.5
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "[{asctime}] {levelname} {name} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "phonics.speech": {
+            "handlers": ["console"],
+            "level": "INFO",
+        },
+        "phonics.requests": {
+            "handlers": ["console"],
+            "level": "INFO",
+        },
+    },
+}
 
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": [

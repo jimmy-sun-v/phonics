@@ -18,8 +18,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+from apps.speech.dashboard_views import diagnostics_dashboard_view
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("diagnostics/", diagnostics_dashboard_view, name="diagnostics-dashboard"),
     # Template (page) views
     path("phonics/", include("apps.phonics.page_urls")),
     path("games/", include("apps.games.page_urls")),
