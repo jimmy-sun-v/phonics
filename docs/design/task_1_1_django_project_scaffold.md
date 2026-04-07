@@ -172,11 +172,11 @@ PhonicsApp/
 
 ## Acceptance Criteria
 
-- [ ] `python manage.py check` passes with no issues
+- [x] `python manage.py check` passes with no issues
 - [ ] `python manage.py runserver` starts without errors
 - [ ] Default Django page renders at `http://localhost:8000`
-- [ ] Settings split into `base.py`, `dev.py`, `prod.py`
-- [ ] `DJANGO_SETTINGS_MODULE` defaults to `config.settings.dev`
+- [x] Settings split into `base.py`, `dev.py`, `prod.py`
+- [x] `DJANGO_SETTINGS_MODULE` defaults to `config.settings.dev`
 
 ## Test Strategy
 
