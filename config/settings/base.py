@@ -68,6 +68,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "apps.common.middleware.easyauth.EasyAuthMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "apps.speech.middleware.AttemptLoggingMiddleware",
@@ -159,6 +160,9 @@ AZURE_OPENAI_DEPLOYMENT = env("AZURE_OPENAI_DEPLOYMENT")
 
 # Session management
 SESSION_RETENTION_HOURS = env("SESSION_RETENTION_HOURS")
+
+# Easy Auth
+EASYAUTH_ENABLED = False
 
 # Phonics engine
 PHONEME_COMPLETION_THRESHOLD = 0.7
