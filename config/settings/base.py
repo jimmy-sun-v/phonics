@@ -10,16 +10,29 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-import os
+import environ
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
-    "DJANGO_SECRET_KEY", "django-insecure-change-me-in-production"
+env = environ.Env(
+    DEBUG=(bool, False),
+    DJANGO_SECRET_KEY=(str, "django-insecure-change-me-in-production"),
+    DATABASE_URL=(str, "sqlite:///db.sqlite3"),
+    AZURE_SPEECH_KEY=(str, ""),
+    AZURE_SPEECH_REGION=(str, ""),
+    AZURE_OPENAI_KEY=(str, ""),
+    AZURE_OPENAI_ENDPOINT=(str, ""),
+    AZURE_OPENAI_DEPLOYMENT=(str, ""),
+    SESSION_RETENTION_HOURS=(int, 24),
 )
+
+# Read .env file if it exists
+env_file = BASE_DIR / ".env"
+if env_file.exists():
+    environ.Env.read_env(str(env_file))
+
+SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -79,10 +92,10 @@ WSGI_APPLICATION = "config.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": env.db(
+        "DATABASE_URL",
+        default="sqlite:///db.sqlite3",
+    )
 }
 
 
@@ -128,3 +141,15 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Azure Speech Services
+AZURE_SPEECH_KEY = env("AZURE_SPEECH_KEY")
+AZURE_SPEECH_REGION = env("AZURE_SPEECH_REGION")
+
+# Azure OpenAI
+AZURE_OPENAI_KEY = env("AZURE_OPENAI_KEY")
+AZURE_OPENAI_ENDPOINT = env("AZURE_OPENAI_ENDPOINT")
+AZURE_OPENAI_DEPLOYMENT = env("AZURE_OPENAI_DEPLOYMENT")
+
+# Session management
+SESSION_RETENTION_HOURS = env("SESSION_RETENTION_HOURS")

@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="AI Phonics Tutor - Learn phonics with fun!">
+    <title>{% block title %}Phonics Tutor{% endblock %}</title>
+
+    <!-- Base CSS -->
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% block header %}
+    <header class="app-header">
+        <div class="header-content">
+            {% block mascot %}{% endblock %}
+            <h1 class="app-title">{% block header_title %}Phonics Tutor{% endblock %}</h1>
+        </div>
+    </header>
+    {% endblock %}
+
+    <main class="main-content" role="main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <nav class="app-nav" role="navigation" aria-label="Main navigation">
+        {% block nav %}{% endblock %}
+    </nav>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
