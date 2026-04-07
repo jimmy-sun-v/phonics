@@ -11,3 +11,5 @@
    - Report the failure back to the major agent so that a human can review and resolve the issue.
 
 5. **Block on failures.** If any task fails, the major agent must **not** proceed to the next task. Execution pauses until the failed task is resolved.
+
+6. **Create a git commit for each task.** If task suceeded, create a git commit for the implementation and doc updates. Keep the commit clean, e.g. only include the necessary files and exclude intermediate files.
