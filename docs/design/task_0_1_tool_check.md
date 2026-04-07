@@ -117,12 +117,12 @@ None (this is the very first task)
 
 ## Acceptance Criteria
 
-- [ ] Python ≥ 3.11 is available on PATH
-- [ ] pip is available
-- [ ] PostgreSQL ≥ 14 is installed and running, dev database created
-- [ ] Git is available
-- [ ] Virtual environment `.venv` created and activated
-- [ ] `pip install -r requirements.txt` succeeds
+- [x] Python ≥ 3.11 is available on PATH
+- [x] pip is available
+- [ ] ~~PostgreSQL ≥ 14 is installed and running, dev database created~~ — PostgreSQL not installed; SQLite will be used for local development. PostgreSQL setup deferred to deployment (Task 7.x).
+- [x] Git is available
+- [x] Virtual environment `.venv` created and activated
+- [x] `pip install -r requirements.txt` succeeds
 
 ## Test Strategy
 
