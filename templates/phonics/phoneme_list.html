@@ -16,7 +16,7 @@
 
     <div class="card-grid phoneme-grid">
         {% for phoneme in phonemes %}
-        <a href="{% url 'phonics:category-list-page' %}"
+        <a href="{% url 'phonics:learning-listen' phoneme.symbol %}"
            class="card phoneme-tile"
            aria-label="{{ phoneme.symbol }} as in {{ phoneme.example_words.0 }}">
             <span class="phoneme-symbol">{{ phoneme.symbol }}</span>

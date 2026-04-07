@@ -1,0 +1,179 @@
+.learning-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    padding: 1rem;
+    text-align: center;
+}
+
+/* Step indicator */
+.step-indicator {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.step-indicator .step {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    background: #e0e0e0;
+    color: #888;
+}
+
+.step-indicator .step.active {
+    background: #4a90d9;
+    color: white;
+}
+
+.step-indicator .step.done {
+    background: #4CAF50;
+    color: white;
+}
+
+/* Large phoneme display */
+.phoneme-display {
+    padding: 2rem;
+}
+
+.phoneme-large {
+    font-size: 5rem;
+    font-weight: 700;
+    font-family: "Courier New", monospace;
+    color: #333;
+}
+
+/* Audio controls */
+.audio-controls {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.btn-round {
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.step-nav {
+    margin-top: 1rem;
+}
+
+.instruction {
+    font-size: 1.25rem;
+    color: #666;
+}
+
+/* === Microphone Button === */
+.mic-button {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid #4a90d9;
+    background: white;
+    font-size: 2.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mic-button:hover {
+    background: #f0f4ff;
+}
+
+.mic-button.recording {
+    border-color: #F44336;
+    background: #ffebee;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4); }
+    50% { box-shadow: 0 0 0 15px rgba(244, 67, 54, 0); }
+}
+
+/* === Recording Indicator === */
+.recording-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #F44336;
+    font-size: 1rem;
+}
+
+.pulse-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #F44336;
+    animation: pulse-dot 1s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* === Confidence Bar === */
+.confidence-bar {
+    width: 100%;
+    max-width: 300px;
+    height: 12px;
+    background: #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 0 auto 1rem;
+}
+
+.confidence-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.5s ease-out;
+    width: 0;
+}
+
+/* === Feedback Text === */
+.feedback-text {
+    font-size: 1.25rem;
+    color: #333;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* === Game Grid === */
+.game-card {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    min-height: 120px;
+}
+
+.game-icon {
+    font-size: 2.5rem;
+}
+
+.game-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.game-grid {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 768px) {
+    .game-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

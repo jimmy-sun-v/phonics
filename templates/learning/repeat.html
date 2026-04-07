@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Say: {{ phoneme.symbol }}{% endblock %}
+{% block header_title %}Say It!{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/learning.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="learning-step repeat-step">
+    <div class="step-indicator">
+        <span class="step done">Listen</span>
+        <span class="step done">See</span>
+        <span class="step active">Say</span>
+        <span class="step">Play</span>
+        <span class="step">Done!</span>
+    </div>
+
+    <div class="phoneme-display">
+        <span class="phoneme-large">{{ phoneme.symbol }}</span>
+    </div>
+
+    <p class="instruction" id="instruction">Tap and say "{{ phoneme.example_words.0 }}"</p>
+
+    <button class="mic-button" id="micBtn" aria-label="Press to record">
+        🎤
+    </button>
+    <div class="recording-indicator" id="recordingIndicator" style="display:none;">
+        <span class="pulse-dot"></span> Listening...
+    </div>
+
+    <div class="feedback-area" id="feedbackArea" style="display:none;">
+        <div class="confidence-bar">
+            <div class="confidence-fill" id="confidenceFill"></div>
+        </div>
+        <p class="feedback-text" id="feedbackText"></p>
+    </div>
+
+    <div class="step-nav" id="stepNav" style="display:none;">
+        <button class="btn-secondary" id="retryBtn">Try Again</button>
+        <a href="{% url 'phonics:learning-practice' phoneme.symbol %}" class="btn-primary" id="nextBtn">
+            Next →
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/speech.js' %}"></script>
+<script>
+    initRepeatStep('{{ phoneme.symbol }}', '{{ session_id }}');
+</script>
+{% endblock %}

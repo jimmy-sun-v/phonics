@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Beginning Sound: {{ phoneme.symbol }}{% endblock %}
+{% block header_title %}Beginning Sound{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/games.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="game-container beginning-sound-game">
+    <div class="game-header">
+        <span class="game-score" id="score">⭐ 0</span>
+    </div>
+
+    <div class="target-word">
+        <span class="target-emoji" aria-hidden="true">🖼️</span>
+        <span class="target-label">{{ example_word }}</span>
+    </div>
+
+    <p class="game-instruction">What sound does it start with?</p>
+
+    <div class="letter-options" id="letterOptions">
+        {% for option in letter_options %}
+        <button class="letter-btn"
+                data-correct="{{ option.is_correct|yesno:'true,false' }}"
+                aria-label="{{ option.symbol }}">
+            {{ option.symbol }}
+        </button>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/games/beginning_sound.js' %}"></script>
+{% endblock %}

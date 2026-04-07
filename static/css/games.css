@@ -1,0 +1,252 @@
+.game-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.game-score {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.game-instruction {
+    text-align: center;
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+/* === Sound Picture Game === */
+.picture-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.picture-card {
+    background: white;
+    border: 3px solid #e0e0e0;
+    border-radius: 16px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.picture-card.correct {
+    border-color: #4CAF50;
+    background: #f1f8e9;
+}
+
+.picture-card.incorrect {
+    opacity: 0.5;
+}
+
+.picture-emoji {
+    font-size: 2.5rem;
+}
+
+.picture-label {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+@keyframes wobble {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.wobble { animation: wobble 0.3s ease-in-out; }
+
+/* === Beginning Sound Game === */
+.target-word {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.target-emoji {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.target-label {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.letter-options {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.letter-btn {
+    padding: 1rem 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border: 3px solid #4a90d9;
+    border-radius: 24px;
+    background: white;
+    cursor: pointer;
+    min-height: 60px;
+    min-width: 60px;
+    transition: all 0.2s;
+}
+
+.letter-btn.correct {
+    border-color: #4CAF50;
+    background: #f1f8e9;
+    color: #4CAF50;
+}
+
+.letter-btn.incorrect {
+    opacity: 0.5;
+}
+
+/* === Blend Builder Game === */
+.word-slots {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.drop-slot {
+    width: 60px;
+    height: 60px;
+    border: 3px dashed #ccc;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.drop-slot.filled {
+    border-style: solid;
+    border-color: #4a90d9;
+    background: #e3f2fd;
+}
+
+.letter-bank {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.letter-tile {
+    width: 60px;
+    height: 60px;
+    background: #fff;
+    border: 2px solid #4a90d9;
+    border-radius: 12px;
+    font-size: 1.75rem;
+    font-weight: 700;
+    cursor: grab;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.letter-tile:active { cursor: grabbing; }
+.letter-tile.used { opacity: 0.3; pointer-events: none; }
+.letter-tile.selected { border-color: #FF9800; background: #FFF8E1; }
+
+.blend-builder-game.complete .word-slots .drop-slot {
+    border-color: #4CAF50;
+    background: #f1f8e9;
+}
+
+/* === Balloon Pop Game === */
+.balloon-pop-game {
+    position: relative;
+    width: 100%;
+    height: 70vh;
+    overflow: hidden;
+    background: linear-gradient(to top, #87CEEB 0%, #E0F7FA 100%);
+    border-radius: 16px;
+}
+
+.balloon {
+    position: absolute;
+    bottom: -80px;
+    width: 60px;
+    height: 75px;
+    border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    animation: float-up-balloon linear forwards;
+    user-select: none;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.balloon::after {
+    content: '\25B3';
+    position: absolute;
+    bottom: -12px;
+    font-size: 0.75rem;
+    color: inherit;
+}
+
+@keyframes float-up-balloon {
+    from { transform: translateY(0); }
+    to { transform: translateY(-100vh); }
+}
+
+.balloon.popped {
+    animation: pop 0.3s ease-out forwards;
+}
+
+@keyframes pop {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.5; }
+    100% { transform: scale(0); opacity: 0; }
+}
+
+.game-complete-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    z-index: 10;
+}
+
+/* === Responsive === */
+@media (min-width: 768px) {
+    .picture-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .balloon {
+        width: 70px;
+        height: 85px;
+        font-size: 1.5rem;
+    }
+}

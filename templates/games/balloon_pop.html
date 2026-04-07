@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Balloon Pop: {{ phoneme.symbol }}{% endblock %}
+{% block header_title %}Balloon Pop{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/games.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="game-container">
+    <div class="game-header">
+        <span class="game-instruction">Pop the <strong>{{ phoneme.symbol }}</strong> balloons!</span>
+        <span class="game-score" id="score">⭐ 0/5</span>
+    </div>
+
+    <div class="balloon-pop-game" id="gameArea"></div>
+</div>
+
+{{ distractors|json_script:"distractors-data" }}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/games/balloon_pop.js' %}"></script>
+<script>
+    const distractors = JSON.parse(document.getElementById('distractors-data').textContent);
+    initBalloonPop('{{ phoneme.symbol }}', distractors);
+</script>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Blend Builder: {{ phoneme.symbol }}{% endblock %}
+{% block header_title %}Blend Builder{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/games.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="game-container blend-builder-game">
+    <p class="game-instruction">Drag the letters to spell the word!</p>
+
+    <div class="word-slots" id="wordSlots"></div>
+
+    <div class="letter-bank" id="letterBank"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/games/blend_builder.js' %}"></script>
+<script>
+    initBlendBuilder('{{ target_word }}');
+</script>
+{% endblock %}

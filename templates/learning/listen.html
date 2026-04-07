@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Listen: {{ phoneme.symbol }}{% endblock %}
+{% block header_title %}Listen!{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/learning.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="learning-step listen-step">
+    <div class="step-indicator">
+        <span class="step active">Listen</span>
+        <span class="step">See</span>
+        <span class="step">Say</span>
+        <span class="step">Play</span>
+        <span class="step">Done!</span>
+    </div>
+
+    <div class="phoneme-display">
+        <span class="phoneme-large" aria-label="Phoneme {{ phoneme.symbol }}">
+            {{ phoneme.symbol }}
+        </span>
+    </div>
+
+    <div class="audio-controls">
+        <button
+            class="btn-primary btn-round listen-btn"
+            id="listenBtn"
+            aria-label="Listen to the sound"
+            data-phoneme="{{ phoneme.symbol }}"
+            data-example="{{ phoneme.example_words.0 }}">
+            🔊 Listen
+        </button>
+
+        <button
+            class="btn-secondary listen-again-btn"
+            id="listenAgainBtn"
+            style="display:none;"
+            aria-label="Listen again">
+            🔁 Again
+        </button>
+    </div>
+
+    <div class="step-nav">
+        <a href="{% url 'phonics:learning-observe' phoneme.symbol %}"
+           class="btn-primary"
+           id="nextBtn"
+           style="display:none;">
+            Next →
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/learning.js' %}"></script>
+<script>
+    initListenStep('{{ phoneme.symbol }}', '{{ phoneme.example_words.0 }}');
+</script>
+{% endblock %}

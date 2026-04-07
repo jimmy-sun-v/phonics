@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Sound Picture: {{ phoneme.symbol }}{% endblock %}
+{% block header_title %}Sound Picture{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/games.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="game-container sound-picture-game">
+    <div class="game-header">
+        <button class="btn-secondary" id="playSound" aria-label="Play sound again">
+            🔊 Hear Sound
+        </button>
+        <span class="game-score" id="score">⭐ 0</span>
+    </div>
+
+    <p class="game-instruction">Tap the right picture!</p>
+
+    <div class="picture-grid" id="pictureGrid">
+        {% for option in options %}
+        <button class="picture-card"
+                data-word="{{ option.word }}"
+                data-correct="{{ option.is_correct|yesno:'true,false' }}"
+                aria-label="{{ option.word }}">
+            <span class="picture-emoji" aria-hidden="true">🖼️</span>
+            <span class="picture-label">{{ option.word }}</span>
+        </button>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/games/sound_picture.js' %}"></script>
+{% endblock %}

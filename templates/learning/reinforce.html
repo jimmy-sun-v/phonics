@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Done: {{ phoneme.symbol }}{% endblock %}
+{% block header_title %}Amazing!{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/learning.css' %}">
+<link rel="stylesheet" href="{% static 'css/animations.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="learning-step reinforce-step">
+    <div class="step-indicator">
+        <span class="step done">Listen</span>
+        <span class="step done">See</span>
+        <span class="step done">Say</span>
+        <span class="step done">Play</span>
+        <span class="step active">Done!</span>
+    </div>
+
+    <div class="celebration">
+        <div class="stars-container" id="starsContainer"></div>
+        <span class="celebration-emoji">⭐</span>
+        <h2 class="celebration-text">Amazing work!</h2>
+        <p class="celebration-sub">You practiced "{{ phoneme.symbol }}"!</p>
+    </div>
+
+    <div class="progress-section">
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: {{ completion_pct }}%"></div>
+        </div>
+        <p class="progress-text">{{ completed_count }} of {{ total_count }} sounds learned</p>
+    </div>
+
+    <div class="step-nav">
+        {% if next_phoneme %}
+        <a href="{% url 'phonics:learning-listen' next_phoneme.symbol %}" class="btn-primary">
+            Next Sound →
+        </a>
+        {% else %}
+        <a href="{% url 'phonics:category-list-page' %}" class="btn-primary">
+            Back to Menu
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/rewards.js' %}"></script>
+{% endblock %}

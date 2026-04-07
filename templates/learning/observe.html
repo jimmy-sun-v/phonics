@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}See: {{ phoneme.symbol }}{% endblock %}
+{% block header_title %}See!{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/learning.css' %}">
+<link rel="stylesheet" href="{% static 'css/animations.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="learning-step observe-step">
+    <div class="step-indicator">
+        <span class="step done">Listen</span>
+        <span class="step active">See</span>
+        <span class="step">Say</span>
+        <span class="step">Play</span>
+        <span class="step">Done!</span>
+    </div>
+
+    <div class="observe-display">
+        <span class="letter-animate" aria-label="Letter {{ phoneme.symbol }}">
+            {{ phoneme.symbol }}
+        </span>
+    </div>
+
+    <div class="example-word" aria-label="Example word">
+        {% for part in word_parts %}
+            {% if part.highlight %}
+                <span class="highlight">{{ part.text }}</span>
+            {% else %}
+                <span>{{ part.text }}</span>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="step-nav">
+        <a href="{% url 'phonics:learning-repeat' phoneme.symbol %}" class="btn-primary">
+            Next →
+        </a>
+    </div>
+</div>
+{% endblock %}

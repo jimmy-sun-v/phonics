@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Play: {{ phoneme.symbol }}{% endblock %}
+{% block header_title %}Play!{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/learning.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="learning-step practice-step">
+    <div class="step-indicator">
+        <span class="step done">Listen</span>
+        <span class="step done">See</span>
+        <span class="step done">Say</span>
+        <span class="step active">Play</span>
+        <span class="step">Done!</span>
+    </div>
+
+    <p class="instruction">Pick a game!</p>
+
+    {% if games %}
+    <div class="card-grid game-grid">
+        {% for game in games %}
+        <a href="/games/{{ game.game_type }}/{{ phoneme.symbol }}/" class="card game-card">
+            <span class="game-icon">
+                {% if game.game_type == 'sound_picture' %}🖼️
+                {% elif game.game_type == 'beginning_sound' %}🔤
+                {% elif game.game_type == 'blend_builder' %}🧩
+                {% elif game.game_type == 'balloon_pop' %}🎈
+                {% endif %}
+            </span>
+            <span class="game-name">{{ game.name }}</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="instruction">No games for this sound yet.</p>
+    {% endif %}
+
+    <div class="step-nav">
+        <a href="{% url 'phonics:learning-reinforce' phoneme.symbol %}" class="btn-secondary">
+            Skip →
+        </a>
+    </div>
+</div>
+{% endblock %}
