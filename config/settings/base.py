@@ -36,6 +36,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Project apps
+    "apps.phonics",
+    "apps.sessions",
+    "apps.speech",
+    "apps.ai_tutor",
+    "apps.games",
 ]
 
 MIDDLEWARE = [
