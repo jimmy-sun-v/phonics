@@ -56,7 +56,7 @@ function initRepeatStep(phonemeSymbol, sessionId) {
 
       setTimeout(() => {
         if (isRecording) stopRecording();
-      }, 5000);
+      }, 3000);
     } catch (err) {
       if (err.name === "NotAllowedError") {
         instruction.textContent = "Please allow microphone access to continue.";
@@ -78,6 +78,7 @@ function initRepeatStep(phonemeSymbol, sessionId) {
 
   async function processRecording() {
     instruction.textContent = "Thinking...";
+    document.getElementById("thinkingAnimation").style.display = "";
 
     const blob = new Blob(audioChunks, { type: "audio/webm" });
     const reader = new FileReader();
@@ -105,6 +106,8 @@ function initRepeatStep(phonemeSymbol, sessionId) {
         feedbackText.textContent = "Something went wrong. Let's try again!";
         feedbackArea.style.display = "";
         stepNav.style.display = "";
+      } finally {
+        document.getElementById("thinkingAnimation").style.display = "none";
       }
     };
 
