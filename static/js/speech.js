@@ -3,7 +3,7 @@ function initRepeatStep(phonemeSymbol, sessionId) {
   const indicator = document.getElementById("recordingIndicator");
   const feedbackArea = document.getElementById("feedbackArea");
   const feedbackText = document.getElementById("feedbackText");
-  const confidenceFill = document.getElementById("confidenceFill");
+  const starRating = document.getElementById("starRating");
   const stepNav = document.getElementById("stepNav");
   const retryBtn = document.getElementById("retryBtn");
   const instruction = document.getElementById("instruction");
@@ -116,11 +116,19 @@ function initRepeatStep(phonemeSymbol, sessionId) {
     feedbackText.textContent = data.feedback || "Good try!";
 
     const confidence = data.confidence || 0;
-    const pct = Math.round(confidence * 100);
-    confidenceFill.style.width = pct + "%";
-    confidenceFill.style.backgroundColor = data.is_correct
-      ? "#4CAF50"
-      : "#FF9800";
+    const starCount = confidence >= 0.75 ? 3 : confidence >= 0.4 ? 2 : 1;
+    starRating.setAttribute("aria-label", starCount + " out of 3 stars");
+    for (let i = 1; i <= 3; i++) {
+      const el = document.getElementById("star" + i);
+      el.className = "star star-empty";
+      el.style.animationDelay = "";
+      if (i <= starCount) {
+        // Force reflow to restart animation
+        void el.offsetWidth;
+        el.className = "star star-filled";
+        el.style.animationDelay = (i - 1) * 0.2 + "s";
+      }
+    }
 
     if (typeof setMascotState === "function") {
       setMascotState(data.is_correct ? "happy" : "encouraging");
