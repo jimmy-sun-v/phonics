@@ -17,6 +17,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.http import JsonResponse
+from django.shortcuts import redirect
 from django.urls import include, path
 
 from apps.speech.dashboard_views import diagnostics_dashboard_view
@@ -27,6 +28,7 @@ def health_check(request):
 
 
 urlpatterns = [
+    path("", lambda request: redirect("phonics:category-list-page")),
     path("health/", health_check, name="health-check"),
     path("admin/", admin.site.urls),
     path("diagnostics/", diagnostics_dashboard_view, name="diagnostics-dashboard"),
