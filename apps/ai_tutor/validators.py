@@ -31,6 +31,7 @@ PERSONAL_QUESTION_PATTERNS = [
 ]
 
 MAX_SENTENCES = 2
+MAX_WORDS = 10
 
 
 def validate_response(response_text: str) -> str:
@@ -55,6 +56,13 @@ def validate_response(response_text: str) -> str:
     if len(sentences) > MAX_SENTENCES:
         logger.info("LLM response too long (%d sentences), truncating to %d", len(sentences), MAX_SENTENCES)
         text = " ".join(sentences[:MAX_SENTENCES])
+
+    words = text.split()
+    if len(words) > MAX_WORDS:
+        logger.info("LLM response too long (%d words), truncating to %d", len(words), MAX_WORDS)
+        text = " ".join(words[:MAX_WORDS]).rstrip(",.;:")
+        if not text.endswith((".", "!", "?")):
+            text += "!"
 
     return text
 
