@@ -4,5 +4,6 @@ djangorestframework>=3.15
 psycopg2-binary>=2.9
 azure-cognitiveservices-speech>=1.37
 openai>=1.30
+pydub>=0.25
 gunicorn>=22.0
 whitenoise>=6.6

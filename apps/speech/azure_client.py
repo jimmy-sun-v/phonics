@@ -1,7 +1,9 @@
+import io
 import logging
 from dataclasses import dataclass
 
 from django.conf import settings
+from pydub import AudioSegment
 
 from apps.speech.logging_config import log_service_call
 
@@ -33,11 +35,13 @@ def recognize_speech(audio_data: bytes, expected_text: str | None = None) -> STT
         )
 
     try:
+        pcm_data = _convert_to_wav(audio_data)
+
         speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=speech_region)
         speech_config.speech_recognition_language = "en-US"
 
         audio_stream = speechsdk.audio.PushAudioInputStream()
-        audio_stream.write(audio_data)
+        audio_stream.write(pcm_data)
         audio_stream.close()
 
         audio_config = speechsdk.audio.AudioConfig(stream=audio_stream)
@@ -72,6 +76,16 @@ def recognize_speech(audio_data: bytes, expected_text: str | None = None) -> STT
     except Exception as e:
         logger.exception("Speech recognition error")
         return STTResult(text="", confidence=0.0, is_successful=False, error_message=str(e))
+
+
+def _convert_to_wav(audio_data: bytes) -> bytes:
+    """Convert audio (e.g. WebM/Opus) to 16-bit 16kHz mono PCM WAV for Azure Speech SDK."""
+    audio_file = io.BytesIO(audio_data)
+    segment = AudioSegment.from_file(audio_file)
+    segment = segment.set_frame_rate(16000).set_channels(1).set_sample_width(2)
+    wav_buffer = io.BytesIO()
+    segment.export(wav_buffer, format="wav")
+    return wav_buffer.getvalue()
 
 
 def _extract_confidence(result) -> float:

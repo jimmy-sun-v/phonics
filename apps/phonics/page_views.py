@@ -3,6 +3,7 @@ from django.shortcuts import redirect, render
 from apps.games.models import Game
 from apps.phonics.models import Phoneme, PhonemeCategory
 from apps.phonics.services import get_all_categories, get_phoneme_detail, get_phonemes_by_category
+from apps.sessions.services import create_session
 
 
 def category_list_view(request):
@@ -46,6 +47,10 @@ def listen_step_view(request, symbol):
     phoneme = get_phoneme_detail(symbol)
     if phoneme is None:
         return redirect("phonics:category-list-page")
+
+    session = create_session()
+    request.session["learning_session_id"] = str(session.session_id)
+
     return render(request, "learning/listen.html", {"phoneme": phoneme})
 
 

@@ -40,6 +40,14 @@ if (Get-Command git -ErrorAction SilentlyContinue) {
     Write-Host "[MISSING] Git required" -ForegroundColor Red
 }
 
+# ffmpeg (required by pydub for audio transcoding)
+if (Get-Command ffmpeg -ErrorAction SilentlyContinue) {
+    $ffmpeg = ffmpeg -version 2>&1 | Select-Object -First 1
+    Write-Host "[OK] $ffmpeg" -ForegroundColor Green
+} else {
+    Write-Host "[MISSING] ffmpeg required (used by pydub for audio format conversion)" -ForegroundColor Red
+}
+
 # venv module
 $venvCheck = python -m venv --help 2>&1
 if ($LASTEXITCODE -eq 0) {
