@@ -18,13 +18,17 @@ Including another URLconf
 from django.contrib import admin
 from django.http import JsonResponse
 from django.shortcuts import redirect
-from django.urls import include, path
+from django.urls import include, path, re_path
 
 from apps.speech.dashboard_views import diagnostics_dashboard_view
 
 
 def health_check(request):
     return JsonResponse({"status": "ok"})
+
+
+def custom_404(request, exception):
+    return redirect("phonics:category-list-page")
 
 
 urlpatterns = [
@@ -41,4 +45,8 @@ urlpatterns = [
     path("api/speech/", include("apps.speech.urls")),
     path("api/ai-tutor/", include("apps.ai_tutor.urls")),
     path("api/games/", include("apps.games.urls")),
+    # Catch-all: redirect any unmatched URL to the start page
+    re_path(r"^.*$", lambda request: redirect("phonics:category-list-page")),
 ]
+
+handler404 = custom_404
