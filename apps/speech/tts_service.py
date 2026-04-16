@@ -31,7 +31,6 @@ def synthesize_speech(text: str) -> TTSResult:
 
     try:
         speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=speech_region)
-        speech_config.speech_synthesis_voice_name = "en-US-AnaNeural"
         speech_config.set_speech_synthesis_output_format(
             speechsdk.SpeechSynthesisOutputFormat.Audio16Khz32KBitRateMonoMp3
         )
@@ -66,7 +65,7 @@ def _build_ssml(text: str) -> str:
     safe_text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;")
     return f"""<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-US">
     <voice name="en-US-AnaNeural">
-        <prosody rate="slow" pitch="medium">
+        <prosody rate="0%" pitch="medium">
             {safe_text}
         </prosody>
     </voice>

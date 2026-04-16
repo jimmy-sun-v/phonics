@@ -19,4 +19,4 @@ class TestTTSService:
     def test_ssml_structure(self):
         ssml = _build_ssml("ship")
         assert "en-US-AnaNeural" in ssml
-        assert 'rate="slow"' in ssml
+        assert 'rate="0%"' in ssml
