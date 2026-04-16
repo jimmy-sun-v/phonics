@@ -31,7 +31,7 @@ PERSONAL_QUESTION_PATTERNS = [
 ]
 
 MAX_SENTENCES = 2
-MAX_WORDS = 10
+MAX_WORDS = 20
 
 
 def validate_response(response_text: str) -> str:

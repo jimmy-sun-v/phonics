@@ -25,6 +25,10 @@ function initRepeatStep(phonemeSymbol, sessionId) {
   }
 
   async function startRecording() {
+    // Clear previous feedback
+    feedbackArea.style.display = "none";
+    stepNav.style.display = "none";
+
     try {
       if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
