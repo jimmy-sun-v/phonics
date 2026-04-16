@@ -124,10 +124,12 @@ def beginning_sound_view(request, symbol):
     random.shuffle(letter_options)
 
     example_word = phoneme.example_words[0] if phoneme.example_words else phoneme.symbol
+    example_emoji = WORD_EMOJI.get(example_word, DEFAULT_EMOJI)
 
     return render(request, "games/beginning_sound.html", {
         "phoneme": phoneme,
         "example_word": example_word,
+        "example_emoji": example_emoji,
         "letter_options": letter_options,
     })
 
