@@ -1,7 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
   const buttons = document.querySelectorAll(".letter-btn");
+  const playBtn = document.getElementById("playWord");
   const scoreEl = document.getElementById("score");
   let currentScore = 0;
+
+  playBtn.addEventListener("click", playTargetWord);
+  playTargetWord();
 
   buttons.forEach((btn) => {
     btn.addEventListener("click", () => handleSelection(btn));
@@ -36,5 +40,13 @@ document.addEventListener("DOMContentLoaded", () => {
       "<p>You found the right sound!</p>" +
       '<a href="javascript:history.back()" class="btn-primary">Continue</a>';
     container.appendChild(overlay);
+  }
+
+  function playTargetWord() {
+    const word = document.querySelector(".target-label").textContent.trim();
+    const audio = new Audio(
+      "/api/speech/tts/?text=" + encodeURIComponent(word),
+    );
+    audio.play().catch(() => {});
   }
 });
