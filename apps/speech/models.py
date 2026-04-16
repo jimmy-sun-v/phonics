@@ -16,8 +16,8 @@ class SpeechAttempt(models.Model):
         help_text="The phoneme that was being practiced",
     )
     confidence = models.FloatField(
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
-        help_text="Speech recognition confidence score (0.0-1.0)",
+        validators=[MinValueValidator(0.0), MaxValueValidator(100.0)],
+        help_text="Pronunciation assessment score (0-100)",
     )
     detected_error = models.CharField(  # noqa: DJ001
         max_length=50,

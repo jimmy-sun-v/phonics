@@ -164,11 +164,11 @@ SESSION_RETENTION_HOURS = env("SESSION_RETENTION_HOURS")
 # Easy Auth
 EASYAUTH_ENABLED = False
 
-# Phonics engine
-PHONEME_COMPLETION_THRESHOLD = 0.7
+# Phonics engine (0-100 scale, from Azure Pronunciation Assessment)
+PHONEME_COMPLETION_THRESHOLD = 70
 
-# Error detection
-LOW_CONFIDENCE_THRESHOLD = 0.5
+# Error detection (0-100 scale)
+LOW_CONFIDENCE_THRESHOLD = 50
 
 # Security
 SECURE_BROWSER_XSS_FILTER = True

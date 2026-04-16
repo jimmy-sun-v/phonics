@@ -45,14 +45,29 @@ def recognize_speech(audio_data: bytes, expected_text: str | None = None) -> STT
         audio_stream.close()
 
         audio_config = speechsdk.audio.AudioConfig(stream=audio_stream)
+
+        if expected_text:
+            pronunciation_config = speechsdk.PronunciationAssessmentConfig(
+                reference_text=expected_text,
+                grading_system=speechsdk.PronunciationAssessmentGradingSystem.HundredMark,
+                granularity=speechsdk.PronunciationAssessmentGranularity.Phoneme,
+            )
+
         recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
+
+        if expected_text:
+            pronunciation_config.apply_to(recognizer)
 
         result = recognizer.recognize_once()
 
         if result.reason == speechsdk.ResultReason.RecognizedSpeech:
-            confidence = _extract_confidence(result)
+            text = result.text.strip().rstrip(".")
+            if expected_text:
+                confidence = _extract_pronunciation_score(result)
+            else:
+                confidence = _extract_confidence(result)
             return STTResult(
-                text=result.text.strip().rstrip("."),
+                text=text,
                 confidence=confidence,
                 is_successful=True,
             )
@@ -86,6 +101,20 @@ def _convert_to_wav(audio_data: bytes) -> bytes:
     wav_buffer = io.BytesIO()
     segment.export(wav_buffer, format="wav")
     return wav_buffer.getvalue()
+
+
+def _extract_pronunciation_score(result) -> float:
+    """Extract the PronunciationScore (0-100) from Pronunciation Assessment result."""
+    import json
+
+    try:
+        details = json.loads(result.json)
+        if "NBest" in details and len(details["NBest"]) > 0:
+            pron_assessment = details["NBest"][0].get("PronunciationAssessment", {})
+            return pron_assessment.get("PronScore", 0.0)
+    except (json.JSONDecodeError, AttributeError, KeyError):
+        logger.warning("Failed to extract pronunciation score from result")
+    return 0.0
 
 
 def _extract_confidence(result) -> float:

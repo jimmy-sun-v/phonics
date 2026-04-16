@@ -46,7 +46,7 @@ class TestPhonicsService:
     def test_get_next_phoneme_skips_completed(self):
         session = LearningSession.objects.create()
         first = Phoneme.objects.filter(category="single_letter").order_by("display_order").first()
-        SpeechAttempt.objects.create(session=session, phoneme=first, confidence=0.9, attempt_number=1)
+        SpeechAttempt.objects.create(session=session, phoneme=first, confidence=90, attempt_number=1)
         next_p = get_next_phoneme(session)
         assert next_p is not None
         assert next_p != first

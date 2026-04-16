@@ -10,6 +10,7 @@ from apps.ai_tutor.feedback import determine_feedback_strategy
 from apps.ai_tutor.llm_client import call_llm
 from apps.ai_tutor.services import render_prompt
 from apps.ai_tutor.validators import validate_response
+from apps.phonics.models import Phoneme
 from apps.sessions.progress import record_attempt
 from apps.speech.azure_client import recognize_speech
 from apps.speech.error_detection import detect_error
@@ -33,7 +34,16 @@ def speech_attempt(request):
     phoneme_symbol = serializer.validated_data["phoneme"]
     audio_bytes = serializer.validated_data["audio"]
 
-    stt_result = recognize_speech(audio_bytes)
+    # Use the first example word as reference text for pronunciation assessment,
+    # since the UI instructs the child to say the example word (e.g. "bat"), not
+    # the raw phoneme symbol (e.g. "b").
+    try:
+        phoneme_obj = Phoneme.objects.get(symbol=phoneme_symbol)
+        reference_text = phoneme_obj.example_words[0] if phoneme_obj.example_words else phoneme_symbol
+    except Phoneme.DoesNotExist:
+        reference_text = phoneme_symbol
+
+    stt_result = recognize_speech(audio_bytes, expected_text=reference_text)
     if not stt_result.is_successful:
         logger.warning("STT failed for session %s: %s", session_id, stt_result.error_message)
         return Response(

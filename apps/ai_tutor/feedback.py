@@ -30,7 +30,7 @@ def determine_feedback_strategy(
         best_confidence = max(max(a.confidence for a in attempts), current_confidence)
 
     if attempt_count <= 1:
-        if current_confidence >= 0.6:
+        if current_confidence >= 60:
             return FeedbackContext(
                 strategy=FeedbackStrategy.ENCOURAGE,
                 attempt_count=attempt_count,

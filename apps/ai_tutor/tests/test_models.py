@@ -22,13 +22,13 @@ class TestPromptTemplateModel:
             system_prompt="You are a tutor.",
             user_template="Phoneme: {phoneme}, Conf: {confidence}, Err: {error}, Att: {attempts}",
         )
-        messages = tpl.render(phoneme="/sh/", confidence=0.61, error="/s/", attempts=3)
+        messages = tpl.render(phoneme="/sh/", confidence=61, error="/s/", attempts=3)
         assert len(messages) == 2
         assert messages[0]["role"] == "system"
         assert messages[0]["content"] == "You are a tutor."
         assert messages[1]["role"] == "user"
         assert "/sh/" in messages[1]["content"]
-        assert "0.61" in messages[1]["content"]
+        assert "61" in messages[1]["content"]
 
     def test_render_with_no_error(self):
         tpl = PromptTemplate(
@@ -36,7 +36,7 @@ class TestPromptTemplateModel:
             system_prompt="Tutor",
             user_template="Error: {error}",
         )
-        messages = tpl.render(phoneme="sh", confidence=0.9, error=None, attempts=1)
+        messages = tpl.render(phoneme="sh", confidence=90, error=None, attempts=1)
         assert "none" in messages[1]["content"]
 
     def test_unique_name(self):

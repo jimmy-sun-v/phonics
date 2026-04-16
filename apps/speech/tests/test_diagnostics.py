@@ -23,10 +23,10 @@ class TestDiagnosticsSummary:
         )
         session = LearningSession.objects.create(current_phoneme=phoneme)
         SpeechAttempt.objects.create(
-            session=session, phoneme=phoneme, confidence=0.9, attempt_number=1
+            session=session, phoneme=phoneme, confidence=90, attempt_number=1
         )
         SpeechAttempt.objects.create(
-            session=session, phoneme=phoneme, confidence=0.3, attempt_number=2
+            session=session, phoneme=phoneme, confidence=30, attempt_number=2
         )
 
         resp = client.get("/api/speech/diagnostics/summary/")
@@ -50,7 +50,7 @@ class TestDiagnosticsPhonemes:
         )
         session = LearningSession.objects.create(current_phoneme=phoneme)
         SpeechAttempt.objects.create(
-            session=session, phoneme=phoneme, confidence=0.8, attempt_number=1
+            session=session, phoneme=phoneme, confidence=80, attempt_number=1
         )
 
         resp = client.get("/api/speech/diagnostics/phonemes/")
@@ -74,7 +74,7 @@ class TestDiagnosticsDaily:
         )
         session = LearningSession.objects.create(current_phoneme=phoneme)
         SpeechAttempt.objects.create(
-            session=session, phoneme=phoneme, confidence=0.8, attempt_number=1
+            session=session, phoneme=phoneme, confidence=80, attempt_number=1
         )
 
         resp = client.get("/api/speech/diagnostics/daily/")

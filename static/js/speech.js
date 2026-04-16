@@ -123,7 +123,7 @@ function initRepeatStep(phonemeSymbol, sessionId) {
     feedbackText.textContent = data.feedback || "Good try!";
 
     const confidence = data.confidence || 0;
-    const starCount = confidence >= 0.75 ? 3 : confidence >= 0.4 ? 2 : 1;
+    const starCount = confidence >= 80 ? 3 : confidence >= 50 ? 2 : 1;
     starRating.setAttribute("aria-label", starCount + " out of 3 stars");
     for (let i = 1; i <= 3; i++) {
       const el = document.getElementById("star" + i);

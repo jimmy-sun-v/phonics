@@ -34,7 +34,7 @@ class ErrorDetectionResult:
 
 
 def detect_error(expected_phoneme: str, stt_text: str, confidence: float) -> ErrorDetectionResult:
-    low_confidence_threshold = getattr(settings, "LOW_CONFIDENCE_THRESHOLD", 0.5)
+    low_confidence_threshold = getattr(settings, "LOW_CONFIDENCE_THRESHOLD", 50)
 
     stt_lower = stt_text.lower().strip()
     phoneme_lower = expected_phoneme.lower().strip()

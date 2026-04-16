@@ -66,24 +66,24 @@ class TestSafetyValidator:
 class TestFeedbackStrategy:
     @patch("apps.ai_tutor.feedback.get_attempts_for_phoneme", return_value=[])
     def test_first_attempt_high_confidence_encourages(self, mock_attempts):
-        ctx = determine_feedback_strategy("fake-id", "sh", 0.8)
+        ctx = determine_feedback_strategy("fake-id", "sh", 80)
         assert ctx.strategy == FeedbackStrategy.ENCOURAGE
 
     @patch("apps.ai_tutor.feedback.get_attempts_for_phoneme", return_value=[])
     def test_first_attempt_low_confidence_guides(self, mock_attempts):
-        ctx = determine_feedback_strategy("fake-id", "sh", 0.3)
+        ctx = determine_feedback_strategy("fake-id", "sh", 30)
         assert ctx.strategy == FeedbackStrategy.GUIDE
 
     @patch("apps.ai_tutor.feedback.get_attempts_for_phoneme")
     def test_many_attempts_adjusts(self, mock_attempts):
         class FakeAttempt:
-            confidence = 0.2
+            confidence = 20
         mock_attempts.return_value = [FakeAttempt(), FakeAttempt(), FakeAttempt()]
-        ctx = determine_feedback_strategy("fake-id", "sh", 0.2)
+        ctx = determine_feedback_strategy("fake-id", "sh", 20)
         assert ctx.strategy == FeedbackStrategy.ADJUST
 
     @patch("apps.ai_tutor.feedback.get_attempts_for_phoneme", return_value=[])
     def test_strategy_always_valid(self, mock_attempts):
         valid_strategies = {FeedbackStrategy.ENCOURAGE, FeedbackStrategy.GUIDE, FeedbackStrategy.ADJUST}
-        ctx = determine_feedback_strategy("fake-id", "sh", 0.5)
+        ctx = determine_feedback_strategy("fake-id", "sh", 50)
         assert ctx.strategy in valid_strategies

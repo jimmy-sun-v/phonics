@@ -44,7 +44,7 @@ class TestPurgeExpiredSessions:
     def test_cascade_deletes_attempts(self, phoneme):
         session = self._create_old_session(hours_ago=48)
         session = LearningSession.objects.get(pk=session.pk)
-        SpeechAttempt.objects.create(session=session, phoneme=phoneme, confidence=0.5, attempt_number=1)
+        SpeechAttempt.objects.create(session=session, phoneme=phoneme, confidence=50, attempt_number=1)
         purge_expired_sessions(retention_hours=24)
         assert SpeechAttempt.objects.count() == 0
 
