@@ -1,0 +1,26 @@
+[
+  {
+    "game_type": "sound_picture",
+    "name": "Sound \u2192 Picture",
+    "description": "Hear the sound and tap the matching picture!",
+    "categories": ["single_letter", "digraph", "blend", "long_vowel", "r_controlled", "diphthong"]
+  },
+  {
+    "game_type": "balloon_pop",
+    "name": "Balloon Pop",
+    "description": "Pop the balloons with the right sound!",
+    "categories": ["single_letter", "digraph", "blend", "long_vowel", "r_controlled", "diphthong"]
+  },
+  {
+    "game_type": "beginning_sound",
+    "name": "Beginning Sound",
+    "description": "Which sound does the word start with?",
+    "categories": ["single_letter", "digraph"]
+  },
+  {
+    "game_type": "blend_builder",
+    "name": "Blend Builder",
+    "description": "Drag the letters to spell the word!",
+    "categories": ["single_letter", "blend"]
+  }
+]

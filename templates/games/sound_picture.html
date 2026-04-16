@@ -25,7 +25,7 @@
                 data-word="{{ option.word }}"
                 data-correct="{{ option.is_correct|yesno:'true,false' }}"
                 aria-label="{{ option.word }}">
-            <span class="picture-emoji" aria-hidden="true">🖼️</span>
+            <span class="picture-emoji" aria-hidden="true">{{ option.emoji }}</span>
             <span class="picture-label">{{ option.word }}</span>
         </button>
         {% endfor %}
