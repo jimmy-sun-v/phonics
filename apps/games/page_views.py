@@ -4,6 +4,7 @@ from django.shortcuts import redirect, render
 
 from apps.phonics.models import Phoneme
 from apps.phonics.services import get_phoneme_detail
+from apps.sessions.services import create_session
 
 # Word-to-emoji mapping for the Sound Picture game.
 # Covers first example words from phonemes.json.
@@ -70,6 +71,11 @@ WORD_EMOJI = {
 }
 
 DEFAULT_EMOJI = "🖼️"
+
+
+def game_list_view(request):
+    """List all available games."""
+    return render(request, "games/game_list.html")
 
 
 def sound_picture_view(request, symbol):
@@ -164,4 +170,14 @@ def balloon_pop_view(request, symbol):
     return render(request, "games/balloon_pop.html", {
         "phoneme": phoneme,
         "distractors": distractors,
+    })
+
+
+def story_builder_view(request):
+    """Collaborative Story Builder game."""
+    session = create_session()
+    request.session["learning_session_id"] = str(session.session_id)
+
+    return render(request, "games/story_builder.html", {
+        "session_id": str(session.session_id),
     })

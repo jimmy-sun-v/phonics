@@ -28,7 +28,7 @@ class TestTTSAPI:
         assert response.status_code == 400
 
     def test_text_too_long(self, client):
-        response = client.get(f"/api/speech/tts/?text={'a' * 101}")
+        response = client.get(f"/api/speech/tts/?text={'a' * 10001}")
         assert response.status_code == 400
 
     @patch("apps.speech.views.synthesize_speech")

@@ -12,7 +12,7 @@ from apps.ai_tutor.services import render_prompt
 from apps.ai_tutor.validators import validate_response
 from apps.phonics.models import Phoneme
 from apps.sessions.progress import record_attempt
-from apps.speech.azure_client import recognize_speech
+from apps.speech.azure_client import recognize_speech, recognize_speech_continuous
 from apps.speech.error_detection import detect_error
 from apps.speech.serializers import SpeechAttemptRequestSerializer, SpeechAttemptResponseSerializer
 from apps.speech.tts_service import synthesize_speech
@@ -116,8 +116,8 @@ def text_to_speech(request):
     text = request.query_params.get("text", "").strip()
     if not text:
         return Response({"error": "Missing 'text' query parameter"}, status=status.HTTP_400_BAD_REQUEST)
-    if len(text) > 100:
-        return Response({"error": "Text exceeds maximum length (100 characters)"}, status=status.HTTP_400_BAD_REQUEST)
+    if len(text) > 10000:
+        return Response({"error": "Text exceeds maximum length (10000 characters)"}, status=status.HTTP_400_BAD_REQUEST)
 
     result = synthesize_speech(text)
     if not result.is_successful:
@@ -127,3 +127,27 @@ def text_to_speech(request):
     response["Content-Length"] = len(result.audio_data)
     response["Cache-Control"] = "public, max-age=3600"
     return response
+
+
+@api_view(["POST"])
+def transcribe(request):
+    """Transcribe audio to text using standard STT (no pronunciation assessment)."""
+    audio_b64 = request.data.get("audio", "")
+    if not audio_b64:
+        return Response({"error": "Missing 'audio' field"}, status=status.HTTP_400_BAD_REQUEST)
+
+    import base64
+
+    try:
+        audio_bytes = base64.b64decode(audio_b64)
+    except Exception:
+        return Response({"error": "Invalid base64 audio data"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if len(audio_bytes) > 5 * 1024 * 1024:
+        return Response({"error": "Audio data exceeds 5 MB"}, status=status.HTTP_400_BAD_REQUEST)
+
+    stt_result = recognize_speech_continuous(audio_bytes)
+    if not stt_result.is_successful:
+        return Response({"text": "", "is_successful": False}, status=status.HTTP_200_OK)
+
+    return Response({"text": stt_result.text, "is_successful": True}, status=status.HTTP_200_OK)

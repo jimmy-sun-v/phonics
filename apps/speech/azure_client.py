@@ -1,5 +1,6 @@
 import io
 import logging
+import threading
 from dataclasses import dataclass
 
 from django.conf import settings
@@ -90,6 +91,91 @@ def recognize_speech(audio_data: bytes, expected_text: str | None = None) -> STT
 
     except Exception as e:
         logger.exception("Speech recognition error")
+        return STTResult(text="", confidence=0.0, is_successful=False, error_message=str(e))
+
+
+@log_service_call("azure_stt_continuous")
+def recognize_speech_continuous(audio_data: bytes) -> STTResult:
+    """Transcribe longer audio using continuous recognition.
+
+    Unlike recognize_once(), this captures all utterances across pauses,
+    making it suitable for story-length recordings (up to ~30 seconds).
+    """
+    import azure.cognitiveservices.speech as speechsdk
+
+    speech_key = settings.AZURE_SPEECH_KEY
+    speech_region = settings.AZURE_SPEECH_REGION
+
+    if not speech_key or not speech_region:
+        logger.error("Azure Speech credentials not configured")
+        return STTResult(
+            text="",
+            confidence=0.0,
+            is_successful=False,
+            error_message="Speech service not configured",
+        )
+
+    try:
+        pcm_data = _convert_to_wav(audio_data)
+
+        speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=speech_region)
+        speech_config.speech_recognition_language = "en-US"
+
+        audio_stream = speechsdk.audio.PushAudioInputStream()
+        audio_stream.write(pcm_data)
+        audio_stream.close()
+
+        audio_config = speechsdk.audio.AudioConfig(stream=audio_stream)
+        recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, audio_config=audio_config)
+
+        done_event = threading.Event()
+        segments: list[str] = []
+        errors: list[str] = []
+
+        def on_recognized(evt):
+            if evt.result.reason == speechsdk.ResultReason.RecognizedSpeech:
+                text = evt.result.text.strip()
+                if text:
+                    segments.append(text)
+
+        def on_canceled(evt):
+            if evt.cancellation_details.reason == speechsdk.CancellationReason.Error:
+                errors.append(str(evt.cancellation_details.error_details))
+            done_event.set()
+
+        def on_session_stopped(evt):
+            done_event.set()
+
+        recognizer.recognized.connect(on_recognized)
+        recognizer.canceled.connect(on_canceled)
+        recognizer.session_stopped.connect(on_session_stopped)
+
+        recognizer.start_continuous_recognition()
+        done_event.wait(timeout=60)
+        recognizer.stop_continuous_recognition()
+
+        if errors:
+            logger.error("Continuous recognition error: %s", errors[0])
+            return STTResult(
+                text="",
+                confidence=0.0,
+                is_successful=False,
+                error_message=errors[0],
+            )
+
+        if not segments:
+            return STTResult(
+                text="",
+                confidence=0.0,
+                is_successful=False,
+                error_message="No speech recognized",
+            )
+
+        full_text = " ".join(segments)
+        return STTResult(text=full_text, confidence=1.0, is_successful=True)
+
+    except Exception as e:
+        logger.exception("Continuous speech recognition error")
         return STTResult(text="", confidence=0.0, is_successful=False, error_message=str(e))
 
 

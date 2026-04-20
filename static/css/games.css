@@ -1,3 +1,19 @@
+.game-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    text-decoration: none;
+    color: #4a90d9;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    padding: 0.25rem 0;
+}
+
+.game-back-btn:hover {
+    color: #357abd;
+}
+
 .game-container {
     max-width: 800px;
     margin: 0 auto;
