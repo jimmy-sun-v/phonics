@@ -45,6 +45,14 @@ def story_turn(request):
     except LearningSession.DoesNotExist:
         return Response({"error": "Session not found"}, status=status.HTTP_404_NOT_FOUND)
 
+    # Track this learning session ID for history browsing
+    _track_story_session_id(request, str(session_id))
+
+    # Ensure Django session is created so we have a session_key
+    if not request.session.session_key:
+        request.session.create()
+    browser_key = request.session.session_key
+
     max_rounds = getattr(settings, "STORY_BUILDER_MAX_ROUNDS", 4)
 
     if story_session_id:
@@ -58,6 +66,7 @@ def story_turn(request):
         story = StorySession.objects.create(
             session=learning_session,
             max_rounds=max_rounds,
+            browser_session_key=browser_key,
         )
 
     story.turns.append({"role": "child", "text": child_text})
@@ -152,3 +161,63 @@ def _generate_story_summary(story: StorySession) -> str:
     else:
         logger.warning("LLM summary call failed: %s", llm_result.error_message)
         return "What a wonderful story we made together!"
+
+
+def _track_story_session_id(request, session_id_str):
+    """Ensure a learning session ID is in the tracked list for history browsing."""
+    story_ids = request.session.get("story_learning_session_ids", [])
+    if session_id_str not in story_ids:
+        story_ids.append(session_id_str)
+        request.session["story_learning_session_ids"] = story_ids
+
+
+def _get_browser_session_key(request):
+    """Return the browser's Django session key, creating the session if needed."""
+    if not request.session.session_key:
+        request.session.create()
+    return request.session.session_key
+
+
+def _claim_unclaimed_stories(browser_key):
+    """Assign unclaimed completed stories to the current browser session."""
+    StorySession.objects.filter(
+        browser_session_key="",
+        is_complete=True,
+    ).update(browser_session_key=browser_key)
+
+
+@api_view(["GET"])
+def story_history_list(request):
+    browser_key = _get_browser_session_key(request)
+
+    # Auto-claim any stories created before session tracking was added
+    _claim_unclaimed_stories(browser_key)
+
+    stories = StorySession.objects.filter(
+        browser_session_key=browser_key,
+        is_complete=True,
+    ).order_by("-created_at")
+
+    from apps.games.serializers import StoryHistoryListSerializer
+
+    serializer = StoryHistoryListSerializer(stories, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def story_history_detail(request, story_session_id):
+    browser_key = _get_browser_session_key(request)
+
+    try:
+        story = StorySession.objects.get(
+            pk=story_session_id,
+            browser_session_key=browser_key,
+            is_complete=True,
+        )
+    except StorySession.DoesNotExist:
+        return Response({"error": "Story not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    from apps.games.serializers import StoryHistoryDetailSerializer
+
+    serializer = StoryHistoryDetailSerializer(story)
+    return Response(serializer.data, status=status.HTTP_200_OK)

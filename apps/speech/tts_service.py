@@ -12,6 +12,7 @@ class TTSResult:
     content_type: str
     is_successful: bool
     error_message: str | None = None
+    word_boundaries: list | None = None
 
 
 def synthesize_speech(text: str) -> TTSResult:
@@ -37,6 +38,18 @@ def synthesize_speech(text: str) -> TTSResult:
 
         synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=None)
 
+        word_boundaries = []
+
+        def on_word_boundary(evt):
+            if evt.boundary_type == speechsdk.SpeechSynthesisBoundaryType.Word:
+                word_boundaries.append({
+                    "text": evt.text,
+                    "offset_ms": evt.audio_offset / 10000,  # ticks to ms
+                    "duration_ms": evt.duration.total_seconds() * 1000,
+                })
+
+        synthesizer.synthesis_word_boundary.connect(on_word_boundary)
+
         ssml = _build_ssml(text)
         result = synthesizer.speak_ssml(ssml)
 
@@ -45,6 +58,7 @@ def synthesize_speech(text: str) -> TTSResult:
                 audio_data=result.audio_data,
                 content_type="audio/mpeg",
                 is_successful=True,
+                word_boundaries=word_boundaries,
             )
         elif result.reason == speechsdk.ResultReason.Canceled:
             cancellation = result.cancellation_details

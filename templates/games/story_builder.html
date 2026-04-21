@@ -157,12 +157,25 @@
     .record-timer-fill.timer-warning {
         background: #f44336;
     }
+
+    .word-highlight {
+        background: #ffe082;
+        transition: background 0.1s;
+    }
+
+    #summaryText span[data-word-index] {
+        border-radius: 3px;
+        padding: 0 2px;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="story-container">
-    <a href="{% url 'games:game-list' %}" class="game-back-btn">← Back</a>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <a href="{% url 'games:game-list' %}" class="game-back-btn">← Back</a>
+        <a href="{% url 'games:story-history' %}" class="btn-secondary" style="font-size: 0.85rem; padding: 0.4rem 0.75rem; text-decoration: none;">📚 My Stories</a>
+    </div>
     <p class="story-intro" id="storyIntro">
         Let's make a story together! You start, and I'll add to it.
     </p>
@@ -201,7 +214,8 @@
         <p id="summaryText"></p>
         <div class="story-actions" style="margin-top: 1rem;">
             <button class="btn-secondary" id="hearSummaryBtn">🔊 Hear it</button>
-            <a href="/games/story_builder/" class="btn-primary">🆕 New Story</a>
+            <a href="{% url 'games:story-history' %}" class="btn-secondary" style="text-decoration: none;">📚 My Stories</a>
+            <a href="/games/story_builder/" class="btn-primary" style="text-decoration: none;">🆕 New Story</a>
         </div>
     </div>
 </div>

@@ -175,9 +175,27 @@ def balloon_pop_view(request, symbol):
 
 def story_builder_view(request):
     """Collaborative Story Builder game."""
+    from apps.games.story_views import _track_story_session_id
+
     session = create_session()
-    request.session["learning_session_id"] = str(session.session_id)
+    session_id_str = str(session.session_id)
+    request.session["learning_session_id"] = session_id_str
+
+    # Track this learning session ID for history browsing
+    _track_story_session_id(request, session_id_str)
 
     return render(request, "games/story_builder.html", {
-        "session_id": str(session.session_id),
+        "session_id": session_id_str,
+    })
+
+
+def story_history_view(request):
+    """Browse previously completed stories."""
+    return render(request, "games/story_history.html")
+
+
+def story_detail_view(request, story_session_id):
+    """Read-only view of a completed story."""
+    return render(request, "games/story_detail.html", {
+        "story_session_id": story_session_id,
     })

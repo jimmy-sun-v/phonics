@@ -87,6 +87,12 @@ class StorySession(models.Model):
         blank=True,
         help_text="LLM-generated summary of the completed story",
     )
+    browser_session_key = models.CharField(
+        max_length=40,
+        blank=True,
+        db_index=True,
+        help_text="Django session key of the browser that created this story",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

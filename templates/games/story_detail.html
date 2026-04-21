@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Story{% endblock %}
+{% block header_title %}Story 📖{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/games.css' %}">
+<style>
+    .detail-container {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .story-trail {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 0.5rem;
+    }
+
+    .story-bubble {
+        max-width: 80%;
+        padding: 0.75rem 1rem;
+        border-radius: 1rem;
+        font-size: 1rem;
+        line-height: 1.4;
+    }
+
+    .story-bubble.child {
+        align-self: flex-end;
+        background: #d4edda;
+        border-bottom-right-radius: 0.25rem;
+    }
+
+    .story-bubble.llm {
+        align-self: flex-start;
+        background: #e3f2fd;
+        border-bottom-left-radius: 0.25rem;
+    }
+
+    .story-bubble .role-label {
+        font-size: 0.75rem;
+        font-weight: bold;
+        color: #888;
+        margin-bottom: 0.25rem;
+    }
+
+    .story-summary {
+        background: #fff9c4;
+        border-radius: 1rem;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .story-summary h3 { margin: 0 0 0.5rem; }
+
+    .story-meta {
+        text-align: center;
+        font-size: 0.85rem;
+        color: #888;
+    }
+
+    .loading-state {
+        text-align: center;
+        padding: 2rem;
+        color: #888;
+    }
+
+    .detail-actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .detail-actions a {
+        text-decoration: none;
+    }
+
+    .word-highlight {
+        background: #ffe082;
+        transition: background 0.1s;
+    }
+
+    #summaryText span[data-word-index] {
+        border-radius: 3px;
+        padding: 0 2px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <a href="{% url 'games:story-history' %}" class="game-back-btn">← My Stories</a>
+
+    <div id="loadingState" class="loading-state">Loading story...</div>
+
+    <div id="storyContent" style="display:none;">
+        <div class="story-meta" id="storyMeta"></div>
+        <div class="story-trail" id="storyTrail"></div>
+
+        <div class="story-summary" id="storySummary" style="display:none;">
+            <h3>✨ Our Story ✨</h3>
+            <p id="summaryText"></p>
+        </div>
+
+        <div class="detail-actions">
+            <button class="btn-primary" id="readStoryBtn" style="display:none;">🔊 Read the Story</button>
+            <a href="{% url 'games:story-history' %}" class="btn-secondary">📚 All Stories</a>
+            <a href="{% url 'games:story-builder' %}" class="btn-primary" style="text-decoration:none;">🆕 New Story</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    var storySessionId = '{{ story_session_id }}';
+    var loadingState = document.getElementById('loadingState');
+    var storyContent = document.getElementById('storyContent');
+    var storyTrail = document.getElementById('storyTrail');
+    var storyMeta = document.getElementById('storyMeta');
+    var storySummary = document.getElementById('storySummary');
+    var summaryText = document.getElementById('summaryText');
+
+    fetch('/api/games/story/history/' + storySessionId + '/')
+        .then(function(response) {
+            if (!response.ok) throw new Error('Not found');
+            return response.json();
+        })
+        .then(function(story) {
+            loadingState.style.display = 'none';
+            storyContent.style.display = 'block';
+
+            var date = new Date(story.created_at);
+            var dateStr = date.toLocaleDateString('en-US', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+            storyMeta.textContent = dateStr + ' · ' + story.round_count + ' rounds';
+
+            story.turns.forEach(function(turn) {
+                var bubble = document.createElement('div');
+                bubble.className = 'story-bubble ' + turn.role;
+                var roleLabel = turn.role === 'child' ? 'You' : 'Storyteller';
+                bubble.innerHTML =
+                    '<div class="role-label">' + escapeHtml(roleLabel) + '</div>' +
+                    '<div>' + escapeHtml(turn.text) + '</div>';
+                storyTrail.appendChild(bubble);
+            });
+
+            if (story.summary) {
+                storySummary.style.display = 'block';
+                // Render summary as individual word spans for highlighting
+                var words = story.summary.split(/(\s+)/);
+                summaryText.innerHTML = '';
+                var wordIndex = 0;
+                words.forEach(function(part) {
+                    if (/\S/.test(part)) {
+                        var span = document.createElement('span');
+                        span.textContent = part;
+                        span.setAttribute('data-word-index', wordIndex);
+                        summaryText.appendChild(span);
+                        wordIndex++;
+                    } else {
+                        summaryText.appendChild(document.createTextNode(part));
+                    }
+                });
+            }
+
+            // Use summary as the final version text for TTS
+            var readAloudText = story.summary || '';
+
+            var readBtn = document.getElementById('readStoryBtn');
+            if (readAloudText) {
+                readBtn.style.display = 'inline-block';
+            }
+            var currentAudio = null;
+            var highlightTimers = [];
+
+            readBtn.addEventListener('click', function() {
+                if (currentAudio && !currentAudio.paused) {
+                    currentAudio.pause();
+                    currentAudio = null;
+                    clearHighlights();
+                    readBtn.textContent = '\ud83d\udd0a Read the Story';
+                    return;
+                }
+                readBtn.textContent = '\u23f3 Loading...';
+                readBtn.disabled = true;
+                fetch('/api/speech/tts/with-words/?text=' + encodeURIComponent(readAloudText))
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        var audioBytes = atob(data.audio_base64);
+                        var arr = new Uint8Array(audioBytes.length);
+                        for (var i = 0; i < audioBytes.length; i++) {
+                            arr[i] = audioBytes.charCodeAt(i);
+                        }
+                        var blob = new Blob([arr], { type: data.content_type });
+                        var url = URL.createObjectURL(blob);
+                        currentAudio = new Audio(url);
+                        currentAudio.play().catch(function() {});
+                        readBtn.textContent = '\u23f9\ufe0f Stop Reading';
+                        readBtn.disabled = false;
+
+                        // Schedule word highlights based on Azure timing data
+                        scheduleHighlights(data.word_boundaries);
+
+                        currentAudio.addEventListener('ended', function() {
+                            readBtn.textContent = '\ud83d\udd0a Read the Story';
+                            currentAudio = null;
+                            clearHighlights();
+                        });
+                    })
+                    .catch(function() {
+                        readBtn.textContent = '\ud83d\udd0a Read the Story';
+                        readBtn.disabled = false;
+                    });
+            });
+
+            function scheduleHighlights(boundaries) {
+                clearHighlights();
+                var wordSpans = summaryText.querySelectorAll('span[data-word-index]');
+                boundaries.forEach(function(wb, i) {
+                    var timer = setTimeout(function() {
+                        // Remove previous highlight
+                        wordSpans.forEach(function(s) { s.classList.remove('word-highlight'); });
+                        if (wordSpans[i]) {
+                            wordSpans[i].classList.add('word-highlight');
+                            wordSpans[i].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }
+                    }, wb.offset_ms);
+                    highlightTimers.push(timer);
+                });
+                // Clear last highlight after final word finishes
+                var last = boundaries[boundaries.length - 1];
+                if (last) {
+                    highlightTimers.push(setTimeout(function() {
+                        wordSpans.forEach(function(s) { s.classList.remove('word-highlight'); });
+                    }, last.offset_ms + last.duration_ms));
+                }
+            }
+
+            function clearHighlights() {
+                highlightTimers.forEach(function(t) { clearTimeout(t); });
+                highlightTimers = [];
+                var wordSpans = summaryText.querySelectorAll('span[data-word-index]');
+                wordSpans.forEach(function(s) { s.classList.remove('word-highlight'); });
+            }
+        })
+        .catch(function() {
+            loadingState.textContent = 'Story not found.';
+        });
+
+    function escapeHtml(text) {
+        var div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+})();
+</script>
+{% endblock %}
+
+{% block nav %}
+<a href="/phonics/" class="nav-item" aria-label="Learn">
+    <span class="nav-icon">📚</span>
+    <span>Learn</span>
+</a>
+<a href="/games/" class="nav-item active" aria-label="Games">
+    <span class="nav-icon">🎮</span>
+    <span>Games</span>
+</a>
+{% endblock %}

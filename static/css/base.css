@@ -16,8 +16,7 @@ body {
     color: #333;
     background-color: #f0f4ff;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    min-height: 100dvh;
 }
 
 img {

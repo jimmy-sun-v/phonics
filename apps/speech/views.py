@@ -129,6 +129,28 @@ def text_to_speech(request):
     return response
 
 
+@api_view(["GET"])
+def text_to_speech_with_words(request):
+    """TTS that returns audio (base64) and word boundary timings for highlighting."""
+    import base64
+
+    text = request.query_params.get("text", "").strip()
+    if not text:
+        return Response({"error": "Missing 'text' query parameter"}, status=status.HTTP_400_BAD_REQUEST)
+    if len(text) > 10000:
+        return Response({"error": "Text exceeds maximum length (10000 characters)"}, status=status.HTTP_400_BAD_REQUEST)
+
+    result = synthesize_speech(text)
+    if not result.is_successful:
+        return Response({"error": "Failed to generate audio"}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+    return Response({
+        "audio_base64": base64.b64encode(result.audio_data).decode("ascii"),
+        "content_type": result.content_type,
+        "word_boundaries": result.word_boundaries or [],
+    })
+
+
 @api_view(["POST"])
 def transcribe(request):
     """Transcribe audio to text using standard STT (no pronunciation assessment)."""

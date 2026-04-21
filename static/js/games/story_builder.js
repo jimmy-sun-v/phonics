@@ -242,16 +242,117 @@ function initStoryBuilder(sessionId) {
   function showSummary(summary) {
     storyControls.style.display = "none";
     storySummary.style.display = "";
-    summaryText.textContent = summary || "What a wonderful story!";
+
+    // Render summary as individual word spans for highlighting
+    const text = summary || "What a wonderful story!";
+    summaryText.innerHTML = "";
+    const parts = text.split(/(\s+)/);
+    let wordIndex = 0;
+    parts.forEach(function (part) {
+      if (/\S/.test(part)) {
+        const span = document.createElement("span");
+        span.textContent = part;
+        span.setAttribute("data-word-index", wordIndex);
+        summaryText.appendChild(span);
+        wordIndex++;
+      } else {
+        summaryText.appendChild(document.createTextNode(part));
+      }
+    });
 
     if (typeof setMascotState === "function") {
       setMascotState("happy");
     }
   }
 
+  let currentAudio = null;
+  let highlightTimers = [];
+
   async function hearSummary() {
     const text = summaryText.textContent;
-    if (text) await playTTS(text);
+    if (!text) return;
+
+    if (currentAudio && !currentAudio.paused) {
+      currentAudio.pause();
+      currentAudio = null;
+      clearHighlights();
+      hearSummaryBtn.textContent = "\uD83D\uDD0A Hear it";
+      return;
+    }
+
+    hearSummaryBtn.textContent = "\u23F3 Loading...";
+    hearSummaryBtn.disabled = true;
+
+    try {
+      const response = await fetch(
+        "/api/speech/tts/with-words/?text=" + encodeURIComponent(text),
+      );
+      if (!response.ok) {
+        hearSummaryBtn.textContent = "\uD83D\uDD0A Hear it";
+        hearSummaryBtn.disabled = false;
+        return;
+      }
+      const data = await response.json();
+      const audioBytes = atob(data.audio_base64);
+      const arr = new Uint8Array(audioBytes.length);
+      for (let i = 0; i < audioBytes.length; i++) {
+        arr[i] = audioBytes.charCodeAt(i);
+      }
+      const blob = new Blob([arr], { type: data.content_type });
+      const url = URL.createObjectURL(blob);
+      currentAudio = new Audio(url);
+      await currentAudio.play().catch(() => {});
+      hearSummaryBtn.textContent = "\u23F9\uFE0F Stop";
+      hearSummaryBtn.disabled = false;
+
+      scheduleHighlights(data.word_boundaries);
+
+      currentAudio.addEventListener("ended", () => {
+        hearSummaryBtn.textContent = "\uD83D\uDD0A Hear it";
+        currentAudio = null;
+        clearHighlights();
+      });
+    } catch (e) {
+      hearSummaryBtn.textContent = "\uD83D\uDD0A Hear it";
+      hearSummaryBtn.disabled = false;
+    }
+  }
+
+  function scheduleHighlights(boundaries) {
+    clearHighlights();
+    const wordSpans = summaryText.querySelectorAll("span[data-word-index]");
+    boundaries.forEach(function (wb, i) {
+      const timer = setTimeout(function () {
+        wordSpans.forEach(function (s) {
+          s.classList.remove("word-highlight");
+        });
+        if (wordSpans[i]) {
+          wordSpans[i].classList.add("word-highlight");
+        }
+      }, wb.offset_ms);
+      highlightTimers.push(timer);
+    });
+    const last = boundaries[boundaries.length - 1];
+    if (last) {
+      highlightTimers.push(
+        setTimeout(function () {
+          wordSpans.forEach(function (s) {
+            s.classList.remove("word-highlight");
+          });
+        }, last.offset_ms + last.duration_ms),
+      );
+    }
+  }
+
+  function clearHighlights() {
+    highlightTimers.forEach(function (t) {
+      clearTimeout(t);
+    });
+    highlightTimers = [];
+    const wordSpans = summaryText.querySelectorAll("span[data-word-index]");
+    wordSpans.forEach(function (s) {
+      s.classList.remove("word-highlight");
+    });
   }
 
   async function playTTS(text) {

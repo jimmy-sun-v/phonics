@@ -11,4 +11,6 @@ urlpatterns = [
     path("blend_builder/<str:symbol>/", page_views.blend_builder_view, name="blend-builder"),
     path("balloon_pop/<str:symbol>/", page_views.balloon_pop_view, name="balloon-pop"),
     path("story_builder/", page_views.story_builder_view, name="story-builder"),
+    path("story_builder/history/", page_views.story_history_view, name="story-history"),
+    path("story_builder/history/<int:story_session_id>/", page_views.story_detail_view, name="story-detail"),
 ]
