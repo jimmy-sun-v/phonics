@@ -44,7 +44,7 @@
     border-top: 2px solid #e0e0e0;
     display: flex;
     justify-content: space-around;
-    padding: 0.5rem 0;
+    padding: 0.5rem 0 calc(0.5rem + env(safe-area-inset-bottom, 0px));
     z-index: 100;
 }
 
@@ -80,7 +80,7 @@
 
 /* Add bottom padding for fixed nav */
 body {
-    padding-bottom: 70px;
+    padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px));
 }
 
 /* === Content Grid Helpers === */
